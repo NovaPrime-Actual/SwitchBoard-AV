@@ -16,6 +16,7 @@ Code tidy to the project's script style guide. No change to what the app does fo
 - The Query tester's list now includes the sources (encoders) as well as the screens, in two groups. The TV power button is for screens only.
 - The About window now links to the project's source on GitHub by default; `SOURCE_URL` overrides it for a changed version.
 - The README now says plainly that SwitchBoard-AV is independent and not affiliated with or endorsed by Visionary Solutions.
+- SECURITY.md says how to report a problem privately.
 - Version bumped to 2.12.
 
 ## v2.11
