@@ -2,7 +2,11 @@
 
 SwitchBoard-AV, newest first.
 
-## v2.12
+## v2.13 (11/05/26)
+
+- The app now listens on every network address by default (`BIND` was `127.0.0.1`), so a server install works for other computers as soon as it starts. Set `BIND=127.0.0.1` to keep it to the computer it runs on. HTTPS is still on by default. The start-up summary shows what it is listening on and the `https://` address to use from another computer.
+
+## v2.12 (11/04/26)
 
 Code tidy to the project's script style guide. No change to what the app does for people, apart from the page's look being rebuilt on shared design tokens.
 

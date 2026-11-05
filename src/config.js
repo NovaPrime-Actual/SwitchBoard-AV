@@ -37,7 +37,7 @@ export const HEALTH_CONCURRENCY = 24;
 export const MAX_BATCH_SCREENS = 100;
 
 // most screens one "switch several at once" request may include
-export const APP_VERSION = "2.12";
+export const APP_VERSION = "2.13";
 
 // shown in the About window; keep in step with the version line in the header comment
 // The code's own notice, shown in the About window (the AGPL asks interactive programs to show the copyright, the
@@ -113,7 +113,9 @@ export const DEVICES_FILE = process.env.DEVICES_FILE
   ? path.resolve(process.env.DEVICES_FILE)
   : path.join(APP_ROOT, "devices.json");
 
-export const BIND_ADDRESS = process.env.BIND || "127.0.0.1";
+// Every network address by default, so a server install works as soon as it starts. BIND=127.0.0.1 keeps it to the
+// computer it runs on (for example behind a reverse proxy on the same machine).
+export const BIND_ADDRESS = process.env.BIND || "0.0.0.0";
 
 export const DATA_DIR = process.env.DATA_DIR
   ? path.resolve(process.env.DATA_DIR)

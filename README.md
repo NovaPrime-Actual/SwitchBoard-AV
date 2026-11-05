@@ -19,7 +19,8 @@ the page.
 node server.js
 ```
 
-Then open `https://localhost:8080` (or whatever `PORT` you set; see **HTTPS** below for the browser warning on the first visit, or use `TLS=off` for plain http). No npm install, no build step —
+The start-up summary lists the addresses to use. Open `https://localhost:8080` on the same computer, or the
+`https://<server address>:8080` it shows under _Network_ from another one (or whatever `PORT` you set; see **HTTPS** below for the browser warning on the first visit, or use `TLS=off` for plain http). No npm install, no build step —
 Node's built-in modules only.
 
 ### Environment variables (all optional)
@@ -30,7 +31,7 @@ Node's built-in modules only.
 | `DATA_DIR`             | `./data`                              | Where accounts, groups, and the activity log are stored                                                                                                                                                    |
 | `PORT`                 | `port` in `data/settings.json` (8080) | Web server port; overrides settings.json when set                                                                                                                                                          |
 | `DEBUG`                | off                                   | Set to `1` to log every UDP/serial packet to the console (troubleshooting only; very chatty). Startup, warnings, errors and switch results always print                                                    |
-| `BIND`                 | `127.0.0.1`                           | Address to listen on. Keep this at 127.0.0.1 unless you mean to expose the app to the rest of the network — see the HTTP/TLS note below before doing that                                                  |
+| `BIND`                 | `0.0.0.0`                             | Address to listen on. The default is every network address, so other computers can connect. Set `127.0.0.1` to allow only the computer it runs on (for example with a reverse proxy on the same machine)   |
 | `TRUST_PROXY`          | unset                                 | Set to `1` only if a TLS-terminating reverse proxy sits in front and sends `X-Forwarded-Proto: https`. Marks the session cookie `Secure`, and makes plain HTTP the default (the proxy does the encryption) |
 | `TV_SERIAL_PORT`       | `6752`                                | TCP port on the decoders for serial-over-IP (TV power). Only change it for testing                                                                                                                         |
 | `STATUS_POLL_SECONDS`  | `20`                                  | How often open pages refresh what each screen is showing. `0` turns auto-refresh off                                                                                                                       |
@@ -209,8 +210,9 @@ To keep a copy of just the screens and sources, use **Download current list** in
   stay in the server's log.
 - **HTTPS is on by default** (next section), so passwords and session cookies are encrypted in
   transit. Only `TLS=off` or a TLS-terminating reverse proxy (`TRUST_PROXY=1`) changes that; the app
-  prints a reminder at start-up if it is listening on the network without HTTPS. Keep `BIND` at
-  `127.0.0.1` (the default) unless you mean to expose the app to the network.
+  prints a reminder at start-up if it is listening on the network without HTTPS. The app listens on every
+  network address by default; set `BIND=127.0.0.1` if it should only be reachable from the computer it runs on.
+  Sign in and change the temporary admin password as soon as you first start it.
 - `devices.json` holds no secrets and the app never writes to it. The live device list is
   `data/devices.store.json`, also free of secrets. Only Admins can see or change the device list.
 

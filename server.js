@@ -1,5 +1,5 @@
 // ===========================================
-// SWITCHBOARD-AV  v2.12
+// SWITCHBOARD-AV  v2.13
 // Description: Local web app that switches Visionary decoders to an encoder over UDP,
 //   with a readback check. Serves public/index.html (+ app.js, tokens.css, style.css) and a small JSON API.
 //   Per-user accounts, roles (admin/manager/user) and access groups scope which decoders
@@ -30,6 +30,7 @@
 // No npm packages needed (Node built-ins only).
 // ===========================================
 
+import os from "node:os";
 import path from "node:path";
 import { hashPassword, pruneSessions } from "./src/auth.js";
 import {
@@ -79,6 +80,17 @@ async function bootstrapAdmin() {
   writeLine(dim("  You will be asked to choose a new password when you first sign in."));
 }
 
+// The addresses other computers can type, one per network card (IPv4 only, loopback left out).
+function networkUrls(scheme) {
+  const urls = [];
+  for (const list of Object.values(os.networkInterfaces())) {
+    for (const a of list || []) {
+      if (a.family === "IPv4" && !a.internal) urls.push(`${scheme}://${a.address}:${WEB_PORT}`);
+    }
+  }
+  return urls;
+}
+
 async function main() {
   await bootstrapAdmin();
   setInterval(pruneSessions, 5 * 60 * 1000).unref(); // forget ended sessions and old failed-sign-in counts
@@ -113,7 +125,15 @@ async function main() {
           : `saved in the data folder (${fileName} is only read the first time the app starts)`,
       ],
       ["Data folder", DATA_DIR],
+      [
+        "Listening",
+        BIND_ADDRESS === "0.0.0.0"
+          ? "every network address (BIND=127.0.0.1: this computer only)"
+          : BIND_ADDRESS,
+      ],
     ];
+    const reachable = BIND_ADDRESS === "0.0.0.0" ? networkUrls(scheme) : [];
+    if (reachable.length) rows.push(["Network", reachable.join("  ")]);
     const notes = []; // [text, isWarning] lines under the table
     if (tlsRuntime.current) {
       const i = tlsRuntime.current.info;

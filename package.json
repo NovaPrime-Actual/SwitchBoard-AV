@@ -1,6 +1,6 @@
 {
   "name": "switchboard-av",
-  "version": "2.12.0",
+  "version": "2.13.0",
   "private": true,
   "description": "Web app that lets staff change the source on Visionary Solutions PacketAV decoders.",
   "license": "AGPL-3.0-or-later",
