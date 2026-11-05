@@ -1,0 +1,1183 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+
+/* ===========================================
+   SWITCHBOARD-AV — styles
+   Phone first: the base rules are the narrow layout, and the one min-width query near the
+   middle widens it. Colours and sizes come from tokens.css. Class names are plain
+   kebab-case, one block per screen area; they are not BEM (recorded in the README).
+   =========================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--surface-0);
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  min-height: var(--control-height);
+  padding: var(--space-4) var(--space-7);
+  cursor: pointer;
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+button:hover:not(:disabled) {
+  background: var(--surface-3);
+}
+
+button:disabled {
+  cursor: default;
+  opacity: var(--opacity-disabled);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: var(--focus-ring-width) solid var(--accent-tint);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.primary {
+  color: var(--text-on-accent);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.primary:hover:not(:disabled) {
+  filter: brightness(var(--hover-brightness)); /* lighter version of whatever the accent is */
+}
+
+.danger {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+
+/* Utility: hiding must win over any display rule on the element, so !important is intended here. */
+.hidden {
+  /* stylelint-disable-next-line declaration-no-important */
+  display: none !important;
+}
+
+/* ===== header ===== */
+header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  align-items: center;
+  padding: var(--space-5) var(--space-10);
+  background: var(--accent);
+}
+
+header h1 {
+  display: none; /* the logo and the app name in the tab are enough on a phone */
+  margin: 0;
+  font-size: var(--font-size-3xl);
+  color: var(--text-on-accent);
+}
+
+.header-logo {
+  display: block;
+  width: auto;
+  max-width: var(--logo-max-width);
+  height: var(--logo-height);
+  object-fit: contain;
+}
+
+.header-spacer {
+  flex: 1;
+}
+
+header button {
+  min-height: var(--control-height-compact);
+  padding: var(--space-3) var(--space-7);
+  color: var(--text-on-accent);
+  background: var(--on-accent-wash);
+  border-color: var(--on-accent-outline);
+}
+
+header button:hover:not(:disabled) {
+  background: var(--on-accent-wash-hover);
+}
+
+/* ===== account menu ===== */
+.menu {
+  position: relative;
+}
+
+.menu-btn {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  max-width: var(--menu-button-max-width);
+}
+
+/* who is signed in: first thing in the dropdown, not a button */
+.menu-who {
+  padding: var(--space-4) var(--space-6) var(--space-5);
+  margin-bottom: var(--space-2);
+  overflow-wrap: anywhere;
+  border-bottom: var(--border-width) solid var(--border);
+}
+
+.menu-who-name {
+  font-weight: var(--font-weight-strong);
+  color: var(--text);
+}
+
+.menu-who-sub {
+  font-size: var(--font-size-md);
+  color: var(--text-dim);
+}
+
+.menu-btn .caret {
+  font-size: var(--font-size-sm);
+}
+
+.menu-list {
+  position: absolute;
+  top: calc(100% + var(--space-3));
+  right: 0;
+  z-index: var(--z-menu);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: var(--menu-min-width);
+  padding: var(--space-3);
+  background: var(--surface-1);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-menu);
+}
+
+.menu-list.hidden {
+  display: none;
+}
+
+/* beats "header button" (accent-coloured header buttons) for the items inside the dropdown */
+header .menu-list button {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: var(--space-4) var(--space-6);
+  color: var(--text);
+  text-align: left;
+  background: transparent;
+  border-color: transparent;
+}
+
+header .menu-list button:hover:not(:disabled),
+header .menu-list button:focus-visible {
+  color: var(--text-on-accent);
+  background: var(--accent);
+}
+
+/* the line of status text in the header; the state classes recolour it only where listed */
+.status-message {
+  font-size: var(--font-size-md);
+  color: var(--text-on-accent);
+}
+
+.status-message.stamp {
+  font-size: var(--font-size-sm);
+  color: var(--on-accent-dim);
+}
+
+.status-message.ok {
+  color: var(--ok);
+}
+
+/* ===== login ===== */
+.login-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-10);
+}
+
+.login-card {
+  width: min(var(--card-width), 100%);
+  padding: var(--space-11);
+  text-align: center;
+  background: var(--surface-1);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+/* Keep the logo's aspect ratio and fit it inside the card. */
+.login-logo {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: var(--login-logo-max-height);
+  margin: 0 auto var(--space-7);
+  object-fit: contain;
+}
+
+.login-card h1 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-3xl);
+}
+
+.login-card .sub {
+  margin-bottom: var(--space-9);
+  font-size: var(--font-size-md);
+  color: var(--text-dim);
+}
+
+.login-card .sub:empty {
+  display: none;
+}
+
+.field {
+  margin-bottom: var(--space-7);
+  text-align: left;
+}
+
+.field label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-md);
+  color: var(--text-dim);
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: var(--space-5);
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+/* Dropdowns (e.g. a screen's Space): large text so the list is easy to read and tap. */
+.field select {
+  font-size: var(--font-size-2xl);
+  cursor: pointer;
+}
+
+.new-space-input {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: var(--space-5);
+  margin-top: var(--space-4);
+  color: var(--text);
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+/* Checkboxes sit inside .field, so they must opt out of the full-width, control-height text-input rule above. */
+input[type="checkbox"],
+.field input[type="checkbox"] {
+  flex: none;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  accent-color: var(--select-tint);
+  cursor: pointer;
+}
+
+/* Without :has() support a label with a tick box simply stays a plain block. */
+@supports selector(:has(*)) {
+  label:has(> input[type="checkbox"]) {
+    display: flex;
+    gap: var(--space-5);
+    align-items: center;
+    min-height: var(--control-height-row);
+    cursor: pointer;
+  }
+}
+
+.login-card button[type="submit"] {
+  width: 100%;
+}
+
+.form-error {
+  min-height: var(--message-height);
+  margin-bottom: var(--space-5);
+  font-size: var(--font-size-md);
+  color: var(--bad);
+}
+
+/* ===== layout: space bar on top (phone) or on the left (wide), tiles beside or below it ===== */
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--header-height));
+}
+
+nav {
+  display: flex;
+  flex: none;
+  flex-direction: row;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  overflow-x: auto;
+  background: var(--surface-1);
+  border-bottom: var(--border-width) solid var(--border);
+}
+
+nav button {
+  display: flex;
+  flex: none;
+  gap: var(--space-4);
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  text-align: left;
+  background: transparent;
+  border-color: transparent;
+}
+
+nav button.active {
+  color: var(--text-on-accent);
+  background: var(--select);
+  border-color: var(--select-tint);
+}
+
+nav .count {
+  font-size: var(--font-size-sm);
+  color: var(--text-dim);
+}
+
+.empty-state {
+  max-width: var(--empty-state-max-width);
+  padding: var(--space-13) var(--space-10);
+  color: var(--text-dim);
+}
+
+/* ===== decoder tiles ===== */
+.tile-grid {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(auto-fill, minmax(var(--tile-grid-min), 1fr));
+  gap: var(--space-7);
+  align-content: start;
+  padding: var(--space-10);
+  padding-bottom: var(--space-14); /* so the last row of tiles clears the corner wording */
+}
+
+.tile {
+  min-width: 0; /* let the grid cell shrink instead of growing around a long name */
+  min-height: var(--tile-min-height);
+  padding: var(--space-7);
+  text-align: left;
+  background: var(--surface-1);
+  border-color: var(--border);
+}
+
+/* Device names such as Gym_Concession_Stand_Display have no spaces, so the browser treats them
+   as one unbreakable word. overflow-wrap: anywhere lets them wrap inside the card. */
+.tile .name,
+.tile .now,
+.tile .ip,
+.src,
+.modal-head h2,
+nav button span {
+  overflow-wrap: anywhere;
+}
+
+.tile .name {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-strong);
+}
+
+.tile .now {
+  margin-top: var(--space-3);
+  font-size: var(--font-size-md);
+  color: var(--accent-tint);
+}
+
+.tile .now.noreply {
+  color: var(--wait);
+}
+
+.tile .ip {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+}
+
+/* ===== modals ===== */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10);
+  background: var(--scrim);
+}
+
+.backdrop.open {
+  display: flex;
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  width: min(var(--modal-width), 100%);
+  max-height: var(--modal-max-height);
+  background: var(--surface-1);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.modal.narrow {
+  width: min(var(--modal-width-narrow), 100%);
+}
+
+.modal-head {
+  display: flex;
+  gap: var(--space-6);
+  align-items: center;
+  padding: var(--space-7) var(--space-9);
+  border-bottom: var(--border-width) solid var(--border);
+}
+
+.modal-head h2 {
+  flex: 1;
+  margin: 0;
+  font-size: var(--font-size-3xl);
+}
+
+.modal-head .close {
+  width: var(--control-height-compact);
+  height: var(--control-height-compact);
+  min-height: var(--control-height-compact);
+  font-size: var(--font-size-3xl);
+}
+
+.sources {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--choice-grid-min), 1fr));
+  gap: var(--space-5);
+  padding: var(--space-9);
+  overflow-y: auto;
+}
+
+.src {
+  min-height: var(--source-min-height);
+  padding: var(--space-7) var(--space-5);
+  font-size: var(--font-size-xl);
+}
+
+.src.current {
+  color: var(--text-on-accent);
+  background: var(--select);
+  border-color: var(--select-tint);
+}
+
+/* ===== source inputs window ===== */
+.input-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+}
+
+.input-choices .src {
+  min-width: var(--choice-min-width);
+  min-height: var(--control-height);
+  padding: var(--space-4) var(--space-7);
+}
+
+/* ===== blank-screen badge on a tile, message row in the popup ===== */
+.tile .badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-4);
+  margin-top: var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-strong);
+  color: var(--wait);
+  border: var(--border-width) solid var(--wait);
+  border-radius: var(--radius-pill);
+}
+
+.tv-power input[type="text"] {
+  flex: 1;
+  min-width: var(--field-min-width);
+  min-height: var(--control-height);
+  padding: var(--space-4);
+  color: var(--text);
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+/* ===== select several screens ===== */
+.select-bar {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.select-bar button {
+  min-height: var(--control-height);
+  padding: var(--space-3) var(--space-7);
+}
+
+.select-count {
+  margin-right: var(--space-2);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-strong);
+}
+
+.tile.selected {
+  background: var(--surface-2); /* fallback */
+  background: color-mix(
+    in srgb,
+    var(--select) var(--selected-mix),
+    var(--surface-2)
+  ); /* surface tinted toward the highlight colour */
+
+  border-color: var(--select-tint);
+  box-shadow: 0 0 0 var(--selected-ring-width) var(--select-tint) inset;
+}
+
+.tile.unselectable {
+  cursor: not-allowed;
+  opacity: var(--opacity-unselectable);
+}
+
+.tile.selected .name::before {
+  color: var(--ok);
+  content: "\2713\00a0"; /* check mark */
+}
+
+/* ===== TV power row in the source popup ===== */
+.tv-power {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  align-items: center;
+  padding: var(--space-6) var(--space-9);
+  border-top: var(--border-width) solid var(--border);
+}
+
+.tv-label {
+  font-weight: var(--font-weight-strong);
+}
+
+.tv-state {
+  font-size: var(--font-size-md);
+  color: var(--accent-tint);
+  overflow-wrap: anywhere;
+}
+
+.tv-state.ok {
+  color: var(--ok);
+}
+
+.tv-state.bad {
+  color: var(--bad);
+}
+
+.tv-state.wait {
+  color: var(--wait);
+}
+
+.tv-power button {
+  min-width: var(--power-button-min-width);
+  min-height: var(--control-height);
+}
+
+.modal-foot {
+  min-height: var(--control-height-compact);
+  padding: var(--space-5) var(--space-9);
+  font-size: var(--font-size-md);
+  border-top: var(--border-width) solid var(--border);
+}
+
+.ok {
+  color: var(--ok);
+}
+
+.bad {
+  color: var(--bad);
+}
+
+.wait {
+  color: var(--wait);
+}
+
+/* ===== query tester ===== */
+.tester-body,
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-9);
+  overflow-y: auto;
+}
+
+.tester-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+}
+
+.tester-row select,
+.tester-row input {
+  flex: 1;
+  min-width: var(--picker-min-width);
+  min-height: var(--control-height);
+  padding: var(--space-4);
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.tester-log {
+  min-height: var(--log-min-height);
+  max-height: var(--log-max-height);
+  padding: var(--space-6);
+  margin: 0;
+  overflow: auto;
+  font: var(--font-size-sm) / var(--line-height-code) var(--font-mono);
+  word-break: break-all;
+  white-space: pre-wrap;
+  background: var(--surface-log);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+/* ===== admin ===== */
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-9) 0;
+  border-bottom: var(--border-width) solid var(--border);
+}
+
+.admin-tabs button {
+  min-height: var(--control-height-tab);
+  background: transparent;
+  border-bottom: none;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.admin-tabs button.active {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.admin-panel {
+  display: none;
+}
+
+.admin-panel.active {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  align-items: center;
+  padding: var(--space-5);
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.row .grow {
+  flex: 1;
+  min-width: var(--field-min-width);
+}
+
+.row .sub {
+  font-size: var(--font-size-sm);
+  color: var(--text-dim);
+}
+
+.row input[type="text"] {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: var(--space-4);
+  color: var(--text);
+  background: var(--surface-0);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.chip {
+  display: inline-block;
+  padding: var(--space-1) var(--space-4);
+  margin-right: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--text-dim);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+}
+
+.chip.role-admin {
+  color: var(--accent-tint);
+  border-color: var(--accent-tint);
+}
+
+.chip.role-manager {
+  color: var(--wait);
+  border-color: var(--wait);
+}
+
+.chip.ok {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+
+.chip.disabled {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+
+.status-summary {
+  font-weight: var(--font-weight-strong);
+}
+
+.status-summary.bad {
+  color: var(--bad);
+}
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--choice-grid-min), 1fr));
+  gap: var(--space-3);
+  max-height: var(--checkbox-grid-max-height);
+  padding: var(--space-5);
+  overflow-y: auto;
+  background: var(--surface-0);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.checkbox-grid label {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  font-size: var(--font-size-md);
+}
+
+/* "Group managers" dropdown: looks like the other form dropdowns, opens to a tick list */
+.manager-pick {
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.manager-pick > summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--control-height);
+  padding: var(--space-5);
+  font-size: var(--font-size-2xl);
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.manager-pick .checkbox-grid {
+  margin: 0 var(--space-4) var(--space-4);
+}
+
+.space-group {
+  padding: var(--space-4);
+  background: var(--surface-0);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.space-group > summary {
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+
+/* keep the whole-space checkbox on the same line as the disclosure arrow */
+.space-group > summary label {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.inline-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  background: var(--surface-0);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.inline-form input[type="text"] {
+  min-height: var(--control-height);
+  padding: var(--space-4);
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.preview-line {
+  font-size: var(--font-size-md);
+  color: var(--text-dim);
+}
+
+/* ===== devices (admin) ===== */
+.sub-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.sub-tabs button {
+  min-height: var(--control-height-compact);
+  padding: var(--space-3) var(--space-8);
+  background: transparent;
+  border-radius: var(--radius-pill);
+}
+
+.sub-tabs button.active {
+  color: var(--text-on-accent);
+  background: var(--select);
+  border-color: var(--select-tint);
+}
+
+.dev-sub {
+  display: none;
+}
+
+.dev-sub.active {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.dev-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.activity-filter {
+  min-height: var(--control-height);
+  padding: var(--space-4);
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.dev-toolbar .activity-filter {
+  flex: 1;
+  min-width: var(--filter-min-width);
+}
+
+.space-head {
+  padding: var(--space-1) var(--space-2);
+  margin-top: var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-strong);
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-caps);
+}
+
+.dev-note {
+  padding: var(--space-5) var(--space-6);
+  font-size: var(--font-size-md);
+  color: var(--ok);
+  overflow-wrap: anywhere;
+  border: var(--border-width) solid var(--ok);
+  border-radius: var(--radius-md);
+}
+
+.dev-note.bad {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+
+.dev-test {
+  font-size: var(--font-size-sm);
+  color: var(--text-dim);
+  overflow-wrap: anywhere;
+}
+
+.dev-test.ok {
+  color: var(--ok);
+}
+
+.dev-test.bad {
+  color: var(--bad);
+}
+
+.dev-test.wait {
+  color: var(--wait);
+}
+
+.paste-text {
+  width: 100%;
+  padding: var(--space-4);
+  font: var(--font-size-sm) / var(--line-height-code) var(--font-mono);
+  color: var(--text);
+  resize: vertical;
+  background: var(--surface-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.paste-result .ok {
+  font-size: var(--font-size-md);
+  color: var(--ok);
+}
+
+.paste-result .bad {
+  font-size: var(--font-size-md);
+  color: var(--bad);
+  overflow-wrap: anywhere;
+}
+
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height-compact);
+  padding: var(--space-3) var(--space-7);
+  font-size: var(--font-size-lg);
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface-1);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.button-link:hover {
+  color: var(--text-on-accent);
+  background: var(--accent);
+}
+
+.temp-password-banner {
+  padding: var(--space-5);
+  font-size: var(--font-size-md);
+  color: var(--ok);
+  word-break: break-all;
+  background: var(--surface-0);
+  border: var(--border-width) solid var(--ok);
+  border-radius: var(--radius-md);
+}
+
+.activity-log {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: var(--activity-max-height);
+  overflow-y: auto;
+}
+
+.activity-log .entry {
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--font-size-sm);
+  background: var(--surface-0);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+/* ===== security tab (admin) ===== */
+.sec-status {
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-strong);
+}
+
+.sec-h {
+  margin: var(--space-10) 0 var(--space-3);
+  font-weight: var(--font-weight-strong);
+}
+
+.sec-fact {
+  margin: var(--space-1) 0;
+  font-size: var(--font-size-md);
+  color: var(--text-dim);
+  overflow-wrap: anywhere;
+}
+
+.sec-fact strong {
+  color: var(--text);
+}
+
+.sec-details .dev-note,
+.sec-check-result .dev-note {
+  margin: var(--space-4) 0;
+}
+
+.sec-actions {
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.sec-upload input[type="file"] {
+  font-size: var(--font-size-lg);
+}
+
+/* ===== branding tab (admin) ===== */
+.brand-color-row {
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+}
+
+.brand-color-row input[type="color"] {
+  flex: none;
+  width: var(--swatch-width);
+  min-height: var(--control-height);
+  padding: var(--space-1);
+  cursor: pointer;
+}
+
+.brand-color-row input[type="text"] {
+  max-width: var(--hex-input-max-width);
+  font-family: var(--font-mono);
+}
+
+.brand-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  align-items: center;
+  padding: var(--space-5) var(--space-7);
+  margin: var(--space-6) 0;
+  color: var(--text-on-accent);
+  background: var(--accent);
+  border-radius: var(--radius-md);
+}
+
+.brand-preview img {
+  width: var(--logo-height);
+  height: var(--logo-height);
+  object-fit: contain;
+}
+
+.brand-preview span {
+  flex: 1;
+  font-weight: var(--font-weight-strong);
+}
+
+/* highlight sample in the Branding tab */
+.brand-preview .brand-preview-select {
+  flex: none;
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--font-size-md);
+  color: var(--text-on-accent);
+  background: var(--select);
+  border: var(--border-width) solid var(--on-accent-outline-strong);
+  border-radius: var(--radius-sm);
+}
+
+.branding-panel .field input[type="file"] {
+  font-size: var(--font-size-lg);
+}
+
+.branding-panel .field .sub {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: normal;
+  color: var(--text-dim);
+}
+
+/* ===== fixed "Powered by" wording (login card and main page); not part of the Branding settings ===== */
+.powered-by {
+  margin-top: var(--space-9);
+  font-size: var(--font-size-sm);
+  color: var(--text-dim);
+}
+
+.powered-by strong {
+  font-weight: var(--font-weight-strong);
+  color: var(--text);
+}
+
+/* on the main page it stays in the corner whatever is scrolled; clicks pass through it */
+.powered-by-fixed {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-4);
+  z-index: var(--z-corner-note);
+  padding: var(--space-1) var(--space-4);
+  margin: 0;
+  pointer-events: none;
+  background: var(--corner-note-surface);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+/* ===== about ===== */
+.about-body {
+  text-align: center;
+}
+
+.about-name {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-strong);
+}
+
+.about-version {
+  margin: var(--space-2) 0 var(--space-7);
+  color: var(--text-dim);
+}
+
+.about-copy {
+  font-size: var(--font-size-md);
+  color: var(--text-dim);
+}
+
+/* ===== backup tab (admin) ===== */
+.backup-part {
+  padding-top: var(--space-8);
+  margin-top: var(--space-12);
+  border-top: var(--border-width) solid var(--border);
+}
+
+/* ===== wide layout: space bar becomes a column on the left ===== */
+@media (width >= 45rem) {
+  header h1 {
+    display: block;
+  }
+
+  .layout {
+    flex-direction: row;
+  }
+
+  nav {
+    flex-direction: column;
+    width: var(--nav-width);
+    overflow-x: visible;
+    border-right: var(--border-width) solid var(--border);
+    border-bottom: none;
+  }
+
+  nav button {
+    flex: initial;
+  }
+}

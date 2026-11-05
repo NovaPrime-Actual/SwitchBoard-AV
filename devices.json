@@ -1,0 +1,17 @@
+{
+  "port": 8080,
+  "decoderPort": 8000,
+  "decoders": [
+    { "name": "Library Display 1", "space": "Library", "ip": "192.0.2.21", "tvPower": "lg" },
+    { "name": "Library Display 2", "space": "Library", "ip": "192.0.2.22", "tvPower": "lg" },
+    { "name": "Gym Scoreboard", "space": "Gym", "ip": "192.0.2.31" },
+    { "name": "Gym Lobby TV", "space": "Gym", "ip": "192.0.2.32" },
+    { "name": "Cafeteria Menu Board", "space": "Cafeteria", "ip": "192.0.2.41" },
+    { "name": "Conference Room", "space": "Offices", "ip": "192.0.2.51" }
+  ],
+  "encoders": [
+    { "name": "Media Player 1", "ip": "198.51.100.11" },
+    { "name": "Media Player 2", "ip": "198.51.100.12" },
+    { "name": "Laptop Input", "ip": "198.51.100.13", "inputs": ["HDMI1", "HDMI2", "USB-C", "AUTO"] }
+  ]
+}

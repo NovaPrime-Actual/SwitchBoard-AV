@@ -1,0 +1,25 @@
+SwitchBoard-AV
+Copyright (c) 2026 Brett Cupp
+
+SwitchBoard-AV is licensed under the GNU Affero General Public License, version 3 or later
+(AGPL-3.0-or-later). The full text is in the LICENSE file.
+
+
+ADDITIONAL TERMS under section 7 of the GNU Affero General Public License, version 3
+
+These terms supplement that license for all of SwitchBoard-AV, including contributions accepted into it. They
+are terms of the kinds that section 7 of the license allows.
+
+1. Trademarks (section 7(e)).
+   This license grants no rights to use the names, trademarks, service marks or logos of SwitchBoard-AV,
+   including the name "SwitchBoard-AV" and the logo in public/logo-default.png, except as described in
+   TRADEMARKS.md.
+
+2. Author attribution (section 7(b)).
+   If you modify SwitchBoard-AV and convey it, or run the modified version so that other people use it over a
+   network, you must preserve the credit
+
+       SwitchBoard-AV by Brett Cupp
+
+   in the About window of the program (the legal notices it displays) and in the copyright notices of its
+   source files. You may introduce the credit with "Based on" and you may add your own credits next to it.

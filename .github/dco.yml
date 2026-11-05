@@ -1,0 +1,6 @@
+# Settings for the DCO GitHub App (https://github.com/apps/dco). Only takes effect when this folder is the
+# root of the repository, where the app reads .github/dco.yml.
+allowRemediationCommits:
+  individual: true # a contributor can fix a missing sign-off with one follow-up commit
+require:
+  members: false # the repository owner's own (signed) commits are not checked

@@ -1,0 +1,28 @@
+{
+  "port": 18080,
+  "decoderPort": 8000,
+  "decoders": [
+    { "name": "A1", "space": "Space A", "ip": "127.0.1.11", "tvPower": "lg" },
+    { "name": "A2", "space": "Space A", "ip": "127.0.1.12", "tvPower": "lg" },
+    { "name": "B1", "space": "Space B", "ip": "127.0.1.21", "tvPower": "lg", "mockNoSerial": true },
+    { "name": "B2", "space": "Space B", "ip": "127.0.1.22" },
+    {
+      "name": "C1",
+      "space": "Space C",
+      "ip": "127.0.1.31",
+      "tvPower": "lg",
+      "mockSilentTv": true,
+      "mockOffline": true
+    }
+  ],
+  "encoders": [
+    { "name": "Source 1", "ip": "127.0.2.11", "inputs": ["HDMI1", "HDMI2", "USB-C", "AUTO"] },
+    {
+      "name": "Source 2",
+      "ip": "127.0.2.12",
+      "inputs": ["HDMI1", "HDMI2"],
+      "mockNoInputChange": true
+    },
+    { "name": "Source 3", "ip": "127.0.2.13", "mockOffline": true }
+  ]
+}

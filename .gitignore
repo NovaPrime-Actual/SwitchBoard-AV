@@ -1,0 +1,5 @@
+# Accounts, groups, device list and activity: runtime data, never committed
+data/
+
+# Development tools (npm install)
+node_modules/

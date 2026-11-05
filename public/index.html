@@ -1,0 +1,746 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{APP_NAME}}</title>
+    <link rel="stylesheet" href="/tokens.css" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/branding.css" />
+  </head>
+  <body>
+    <!-- ===== login ===== -->
+    <div id="loginScreen" class="login-screen">
+      <form class="login-card" id="loginForm">
+        <img id="loginLogo" class="login-logo" src="{{LOGO_URL}}" alt="{{LOGO_ALT}}" />
+        <h1>{{APP_NAME}}</h1>
+        <div class="sub">{{ORG_NAME}}</div>
+        <div class="form-error" id="loginError"></div>
+        <div class="field">
+          <label for="loginUsername">Username</label>
+          <input type="text" id="loginUsername" name="username" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input
+            id="loginPassword"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+        <button type="submit" class="primary" id="loginSubmit">Sign in</button>
+        <!-- fixed wording: not part of the Branding settings, so the program's name always shows -->
+        <div class="powered-by">Powered by <strong>SwitchBoard-AV</strong></div>
+      </form>
+    </div>
+
+    <!-- ===== main app shell ===== -->
+    <div id="appShell" class="hidden">
+      <header>
+        <img id="logo" class="header-logo" src="{{LOGO_URL}}" alt="{{LOGO_ALT}}" />
+        <h1>{{APP_NAME}}</h1>
+        <span id="msg" class="status-message"></span>
+        <span class="header-spacer"></span>
+        <button type="button" id="openTester" class="hidden">Query tester</button>
+        <div class="menu" id="userMenu">
+          <button
+            id="menuBtn"
+            class="menu-btn"
+            type="button"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-controls="menuList"
+          >
+            <span>Menu</span><span class="caret" aria-hidden="true">&#9662;</span>
+          </button>
+          <div id="menuList" class="menu-list hidden" role="menu" aria-labelledby="menuBtn">
+            <div class="menu-who" id="menuWho">
+              <div class="menu-who-name" id="menuWhoName"></div>
+              <div class="menu-who-sub" id="menuWhoRole"></div>
+              <div class="menu-who-sub" id="menuWhoGroups"></div>
+            </div>
+            <button id="refresh" type="button" role="menuitem">Refresh</button>
+            <button id="inputsBtn" type="button" role="menuitem" class="hidden">
+              Source inputs
+            </button>
+            <button id="adminBtn" type="button" role="menuitem" class="hidden">Users</button>
+            <button id="devicesBtn" type="button" role="menuitem" class="hidden">Devices</button>
+            <button id="statusBtn" type="button" role="menuitem" class="hidden">Status</button>
+            <button id="changePasswordBtn" type="button" role="menuitem">Change password</button>
+            <button id="aboutBtn" type="button" role="menuitem">About</button>
+            <button id="logoutBtn" type="button" role="menuitem">Sign out</button>
+          </div>
+        </div>
+      </header>
+      <div class="layout">
+        <nav id="spaces"></nav>
+        <main id="grid" class="tile-grid"></main>
+      </div>
+      <!-- fixed wording: not part of the Branding settings, so the program's name always shows -->
+      <div class="powered-by powered-by-fixed">Powered by <strong>SwitchBoard-AV</strong></div>
+    </div>
+
+    <!-- ===== source popup ===== -->
+    <div class="backdrop" id="backdrop">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-head">
+          <!-- [html-validate-disable-next empty-heading -- app.js fills in the title] -->
+          <h2 id="modalTitle"></h2>
+          <button type="button" class="close" id="close" aria-label="Close">&#x2715;</button>
+        </div>
+        <div class="sources" id="sources"></div>
+        <div class="tv-power hidden" id="screenRow">
+          <span class="tv-label">Screen</span>
+          <span class="tv-state" id="screenState"></span>
+          <span class="header-spacer"></span>
+          <button id="scrPicture" type="button">Picture</button>
+          <button id="scrBlack" type="button">Black</button>
+          <button id="scrLogo" type="button">Logo</button>
+        </div>
+        <div class="tv-power hidden" id="msgRow">
+          <label class="tv-label" for="msgText">Message</label>
+          <input
+            id="msgText"
+            type="text"
+            maxlength="80"
+            placeholder="Shown on this screen"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button id="msgShow" type="button">Show</button>
+          <button id="msgClear" type="button">Clear</button>
+          <div class="tv-state" id="msgState"></div>
+        </div>
+        <div class="tv-power hidden" id="tvPowerRow">
+          <span class="tv-label">TV power</span>
+          <span class="tv-state" id="tvState"></span>
+          <span class="header-spacer"></span>
+          <button id="tvOn" type="button">On</button>
+          <button id="tvOff" type="button">Off</button>
+        </div>
+        <div class="modal-foot" id="status"></div>
+      </div>
+    </div>
+
+    <!-- ===== query tester (admin only) ===== -->
+    <div class="backdrop" id="testerBackdrop">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="testerTitle">
+        <div class="modal-head">
+          <h2 id="testerTitle">Query tester</h2>
+          <button type="button" class="close" id="testerClose" aria-label="Close">&#x2715;</button>
+        </div>
+        <div class="tester-body">
+          <div class="tester-row">
+            <select id="testerDecoder"></select>
+            <input
+              type="text"
+              id="testerKey"
+              placeholder="Key name only, e.g. UNIT.MODEL"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button type="button" id="testerSend">Send</button>
+            <button type="button" id="testerClear">Clear</button>
+          </div>
+          <div class="tester-row" id="diagRow">
+            <button type="button" data-diag="ALL">All settings</button>
+            <button type="button" data-diag="VIDEO_TIMING">Video info</button>
+            <button type="button" data-diag="TEMPERATURE">Temperature</button>
+            <button type="button" data-diag="NETWORK_INFO">Network info</button>
+            <button type="button" data-diag="AUDIO_INFO">Audio info</button>
+            <button type="button" data-diag="USB_INFO">USB info</button>
+            <button type="button" id="testerTvPower">TV power (serial)</button>
+          </div>
+          <div class="sub">
+            Buttons send <code>QUERY.&lt;NAME&gt;=TRUE</code> (the diagnostics page queries). The
+            box sends
+            <code>CMD=START&amp;UNIT.ID=ALL&amp;QUERY.KEY=&lt;key&gt;&amp;CMD=END</code> and shows
+            every raw reply for 2 seconds. Read-only.
+          </div>
+          <pre id="testerLog" class="tester-log"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== change password ===== -->
+    <div class="backdrop" id="pwBackdrop">
+      <div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+        <div class="modal-head">
+          <h2 id="pwTitle">Change password</h2>
+          <button type="button" class="close hidden" id="pwClose" aria-label="Close">
+            &#x2715;
+          </button>
+        </div>
+        <form class="modal-body" id="pwForm">
+          <div class="sub" id="pwForcedNote"></div>
+          <div class="form-error" id="pwError"></div>
+          <div class="field">
+            <label for="pwCurrent">Current password</label>
+            <input id="pwCurrent" type="password" autocomplete="current-password" required />
+          </div>
+          <div class="field">
+            <label for="pwNew"
+              >New password (at least 8 characters, with a number or special character)</label
+            >
+            <input id="pwNew" type="password" autocomplete="new-password" minlength="8" required />
+          </div>
+          <div class="field">
+            <label for="pwConfirm">Confirm new password</label>
+            <input
+              id="pwConfirm"
+              type="password"
+              autocomplete="new-password"
+              minlength="8"
+              required
+            />
+          </div>
+          <button type="submit" class="primary">Change password</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== about ===== -->
+    <div class="backdrop" id="aboutBackdrop">
+      <div class="modal narrow" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+        <div class="modal-head">
+          <h2 id="aboutTitle">About</h2>
+          <button type="button" class="close" id="aboutClose" aria-label="Close">&#x2715;</button>
+        </div>
+        <div class="modal-body about-body">
+          <div class="about-name">SwitchBoard-AV</div>
+          <div class="about-version" id="aboutVersion"></div>
+          <!-- fixed credit (NOTICE, additional term 2): not part of the Branding settings -->
+          <div class="about-version">by Brett Cupp</div>
+          <div class="about-version hidden" id="aboutSetup"></div>
+          <p>
+            Free and open source software, released under the <strong id="aboutLicense"></strong>.
+            You may use, change and share it. If you run a changed version for other people, they
+            are entitled to its source code.
+          </p>
+          <p class="about-copy" id="aboutCopyright"></p>
+          <p class="about-copy">
+            This program comes with ABSOLUTELY NO WARRANTY. The full license text is in the LICENSE
+            file that comes with the program.
+          </p>
+          <p class="about-copy hidden" id="aboutSource"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== source inputs ===== -->
+    <div class="backdrop" id="inputsBackdrop">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="inputsTitle">
+        <div class="modal-head">
+          <h2 id="inputsTitle">Source inputs</h2>
+          <button type="button" class="close" id="inputsClose" aria-label="Close">&#x2715;</button>
+        </div>
+        <div class="modal-body">
+          <div class="preview-line">
+            Changing an input changes what every screen showing that source sees.
+          </div>
+          <div id="inputsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== admin ===== -->
+    <div class="backdrop" id="adminBackdrop">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+        <div class="modal-head">
+          <h2 id="adminTitle">Users</h2>
+          <button type="button" class="close" id="adminClose" aria-label="Close">&#x2715;</button>
+        </div>
+        <div class="admin-tabs">
+          <button type="button" data-tab="users" class="active">Users</button>
+          <button type="button" data-tab="groups" id="groupsTabBtn">Groups</button>
+          <button type="button" data-tab="activity" id="activityTabBtn">Activity</button>
+          <button type="button" data-tab="devices" id="devicesTabBtn">Devices</button>
+          <button type="button" data-tab="status" id="statusTabBtn">Status</button>
+          <button type="button" data-tab="branding" id="brandingTabBtn">Branding</button>
+          <button type="button" data-tab="security" id="securityTabBtn">Security</button>
+          <button type="button" data-tab="backup" id="backupTabBtn">Backup</button>
+        </div>
+        <div class="modal-body">
+          <div class="admin-panel active" id="usersPanel">
+            <button type="button" id="addUserBtn" class="primary">Add user</button>
+            <div class="inline-form hidden" id="addUserForm">
+              <div class="field">
+                <label for="newUserName">Full name</label>
+                <input id="newUserName" type="text" />
+              </div>
+              <div class="field">
+                <label for="newUserUsername">Username</label>
+                <input id="newUserUsername" type="text" autocomplete="off" spellcheck="false" />
+              </div>
+              <div class="field" id="newUserRoleField">
+                <label for="newUserRole">Role</label>
+                <select id="newUserRole">
+                  <option value="user">User — switch sources in their groups</option>
+                  <option value="manager">Manager — can also manage users in their groups</option>
+                  <option value="admin">Admin — full access</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Groups</label>
+                <div class="checkbox-grid" id="newUserGroups"></div>
+              </div>
+              <div class="form-error" id="newUserError"></div>
+              <div class="row">
+                <button type="button" id="newUserSave" class="primary">Save user</button>
+                <button id="newUserCancel" type="button">Cancel</button>
+              </div>
+            </div>
+            <div class="temp-password-banner hidden" id="tempPasswordBanner"></div>
+            <div id="usersList"></div>
+          </div>
+
+          <div class="admin-panel" id="groupsPanel">
+            <button type="button" id="addGroupBtn" class="primary">Add group</button>
+            <div class="inline-form hidden" id="groupForm">
+              <input type="hidden" id="groupFormId" />
+              <div class="field">
+                <label for="groupName">Group name</label>
+                <input id="groupName" type="text" />
+              </div>
+              <div class="field">
+                <label>Spaces (whole-space access)</label>
+                <div id="groupSpaces"></div>
+              </div>
+              <div class="field">
+                <label>Sources this group may use</label>
+                <label><input type="checkbox" id="groupSourcesAll" /> All sources</label>
+                <div class="checkbox-grid" id="groupSources"></div>
+              </div>
+              <div class="field">
+                <label
+                  ><input type="checkbox" id="groupTvPower" /> Can turn TVs on and off (only on
+                  screens set up for it)</label
+                >
+              </div>
+              <div class="field">
+                <label
+                  ><input type="checkbox" id="groupScreenControl" /> Can blank screens and show a
+                  message on them</label
+                >
+              </div>
+              <div class="field">
+                <label
+                  ><input type="checkbox" id="groupInputControl" /> Can change which input a source
+                  uses (only for sources set up for it)</label
+                >
+              </div>
+              <div class="field">
+                <label
+                  ><input type="checkbox" id="groupMultiSwitch" /> Can select several screens and
+                  switch them together</label
+                >
+              </div>
+              <div class="field">
+                <label>Group managers (optional)</label>
+                <div class="preview-line">
+                  Managers can add people to this group and reset their passwords. Only people with
+                  the Manager role are listed.
+                </div>
+                <details class="manager-pick">
+                  <summary id="groupManagersSummary">No managers</summary>
+                  <div class="checkbox-grid" id="groupManagers"></div>
+                </details>
+              </div>
+              <div class="preview-line" id="groupPreview"></div>
+              <div class="form-error" id="groupError"></div>
+              <div class="row">
+                <button type="button" id="groupSave" class="primary">Save group</button>
+                <button id="groupCancel" type="button">Cancel</button>
+              </div>
+            </div>
+            <div id="groupsList"></div>
+          </div>
+
+          <div class="admin-panel" id="activityPanel">
+            <input
+              type="text"
+              class="activity-filter"
+              id="activityFilter"
+              placeholder="Filter (username, screen, action...)"
+            />
+            <div id="activityLog" class="activity-log"></div>
+          </div>
+
+          <div class="admin-panel" id="statusPanel">
+            <div class="row">
+              <div class="grow">
+                <div id="statusSummary" class="status-summary">Checking...</div>
+                <div class="sub" id="statusWhen"></div>
+              </div>
+              <button id="statusCheckBtn" type="button" class="primary">Check all now</button>
+            </div>
+            <div class="preview-line">
+              Asks the screens and sources shown here for their model, and shows who answers and how
+              fast. Admins see everything; managers see the screens and sources of the groups they
+              manage. Screens also refresh by themselves for everyone using the app.
+            </div>
+            <div id="statusList"></div>
+          </div>
+
+          <div class="admin-panel branding-panel" id="brandingPanel">
+            <div class="preview-line">
+              Put your organization's name, logo and colour on the sign-in page and the header.
+              Changes apply for everyone as soon as you save.
+            </div>
+            <div class="dev-note hidden" id="brandNote"></div>
+            <div class="field">
+              <label for="brandAppName">App name (shown in the header and the browser tab)</label>
+              <input id="brandAppName" type="text" maxlength="40" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="brandOrgName"
+                >Organization name (optional, shown on the sign-in page)</label
+              >
+              <input id="brandOrgName" type="text" maxlength="80" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="brandAccent">Colour (header and buttons)</label>
+              <div class="brand-color-row">
+                <input id="brandAccent" type="color" value="#59606b" />
+                <input
+                  id="brandAccentHex"
+                  type="text"
+                  maxlength="7"
+                  spellcheck="false"
+                  autocomplete="off"
+                  aria-label="Colour as a hex code"
+                />
+              </div>
+              <div class="sub">
+                Pick a colour that white text is easy to read on. Very light colours are refused.
+              </div>
+            </div>
+            <div class="field">
+              <label for="brandSelect">Highlight colour (selected items)</label>
+              <div class="brand-color-row">
+                <input id="brandSelect" type="color" value="#a6171d" />
+                <input
+                  id="brandSelectHex"
+                  type="text"
+                  maxlength="7"
+                  spellcheck="false"
+                  autocomplete="off"
+                  aria-label="Highlight colour as a hex code"
+                />
+              </div>
+              <div class="sub">
+                Used for the chosen space, the current source and picked screens.
+              </div>
+            </div>
+            <div class="field">
+              <label for="brandLogoFile"
+                >Logo (PNG, JPEG, GIF or WebP, up to 512 KB; square works best)</label
+              >
+              <input
+                id="brandLogoFile"
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+              />
+            </div>
+            <div class="brand-preview" id="brandPreview">
+              <!-- [html-validate-disable-next element-required-attributes -- app.js sets the logo src] -->
+              <img id="brandPreviewLogo" alt="" />
+              <span id="brandPreviewName"></span>
+              <button type="button" class="primary" tabindex="-1">Sample button</button>
+              <span class="brand-preview-select" id="brandPreviewSelect">Selected</span>
+            </div>
+            <div class="row">
+              <button id="brandSaveBtn" type="button" class="primary">Save</button>
+              <button id="brandRemoveLogoBtn" type="button" class="hidden">Remove logo</button>
+              <button id="brandResetBtn" type="button">Reset to defaults</button>
+            </div>
+          </div>
+
+          <div class="admin-panel" id="securityPanel">
+            <div class="sec-status" id="secSummary">Checking...</div>
+            <div class="dev-note hidden" id="secNote"></div>
+            <div id="secDetails" class="sec-details"></div>
+            <div class="row sec-actions">
+              <a
+                id="secDownload"
+                class="button-link hidden"
+                href="/api/admin/tls/certificate"
+                download="switchboard-av-certificate.pem"
+                >Download certificate</a
+              >
+              <button id="secResetBtn" type="button" class="hidden">Go back to self-signed</button>
+            </div>
+            <div class="preview-line hidden" id="secDownloadHelp">
+              The downloaded certificate can be installed as trusted on a computer (Windows:
+              right-click it &rarr; Install Certificate &rarr; Trusted Root Certification
+              Authorities), which removes the browser warning on that computer.
+            </div>
+
+            <div id="secUpload" class="sec-upload">
+              <div class="sec-h">Use your own certificate</div>
+              <div class="preview-line">
+                If you have a proper certificate for this server's name, upload it here and browsers
+                stop showing a warning. You need two files from whoever issued it (your IT team or a
+                certificate provider): the certificate (.pem, .crt or .cer) and its private key
+                (.key or .pem). No restart needed. Use <strong>Check files</strong> first to see
+                what is in them.
+              </div>
+              <div class="field">
+                <label for="secCertFile">Certificate file</label>
+                <input id="secCertFile" type="file" accept=".pem,.crt,.cer,.cert" />
+              </div>
+              <div class="field">
+                <label for="secKeyFile">Key file</label>
+                <input id="secKeyFile" type="file" accept=".key,.pem" />
+              </div>
+              <div class="field">
+                <label for="secPass">Key password (only if the key has one)</label>
+                <input id="secPass" type="password" autocomplete="new-password" />
+              </div>
+              <div class="row">
+                <button id="secCheckBtn" type="button" class="primary">Check files</button>
+                <button id="secInstallBtn" type="button" disabled>Install certificate</button>
+              </div>
+              <div id="secCheckResult" class="sec-check-result"></div>
+            </div>
+          </div>
+
+          <div class="admin-panel" id="backupPanel">
+            <div class="dev-note hidden" id="backupNote"></div>
+
+            <div class="sec-status">Back up everything</div>
+            <div class="preview-line">
+              One file with all of the app's saved information: user accounts and access groups, the
+              screens and sources list (with its saved earlier versions), branding, settings and the
+              activity log.
+            </div>
+            <div class="row sec-actions">
+              <a id="backupDownload" class="button-link" href="/api/admin/backup" download
+                >Download full backup (.zip)</a
+              >
+            </div>
+            <div class="dev-note bad">
+              Keep the file private. It contains everyone's accounts, including their password
+              hashes.
+            </div>
+            <div class="sec-h">Not included</div>
+            <div class="preview-line">
+              The HTTPS certificate and its key. The app makes a new self-signed certificate, or you
+              upload your own again in the Security tab.
+            </div>
+            <div class="sec-h">Restoring</div>
+            <div class="preview-line">
+              1. Stop the app.<br />2. Unzip the file into the app's data folder (the
+              <code>data</code> folder next to the app, unless it was moved), replacing the files
+              with the same names.<br />3. Start the app. People sign in with the same passwords as
+              when the backup was made.<br />The same steps are written in
+              <code>RESTORE.txt</code> inside the zip.
+            </div>
+
+            <div class="sec-status backup-part">Screens and sources list</div>
+            <div class="preview-line" id="devSourceNote"></div>
+            <div class="row sec-actions">
+              <a
+                id="exportBtn"
+                class="button-link"
+                href="/api/admin/devices/export"
+                download="devices.json"
+                >Download current list</a
+              >
+            </div>
+            <div class="preview-line">
+              <strong>Download current list</strong> saves just the screens, sources and spaces,
+              exactly as they are now, in the devices.json format. (The full backup above already
+              includes them.)
+            </div>
+            <div class="sec-h">Restore the list from a file</div>
+            <div class="field">
+              <label for="devFile"
+                >A devices.json file, for example one you downloaded earlier</label
+              >
+              <input id="devFile" type="file" accept=".json,application/json" />
+            </div>
+            <div class="row">
+              <button id="devFileCheckBtn" type="button" class="primary">Check file</button>
+              <button id="reimportBtn" type="button" class="danger" disabled>
+                Replace the list with this file
+              </button>
+            </div>
+            <div id="devFileResult"></div>
+
+            <div class="sec-status backup-part">List change history</div>
+            <div class="preview-line">
+              Every change to the screens and sources keeps the list as it was before. Restoring
+              brings back the screens and sources only; group settings stay as they are now.
+            </div>
+            <div class="field">
+              <label for="historyKeep">Earlier versions to keep</label>
+              <select id="historyKeep"></select>
+            </div>
+            <div id="historyList"></div>
+          </div>
+
+          <div class="admin-panel" id="devicesPanel">
+            <div class="sub-tabs" id="devSubTabs">
+              <button type="button" data-sub="screens" class="active">Screens</button>
+              <button type="button" data-sub="sources">Sources</button>
+              <button type="button" data-sub="spaces">Spaces</button>
+            </div>
+            <div class="dev-note hidden" id="devNote"></div>
+
+            <!-- shared by Screens and Sources: paste a list from a spreadsheet -->
+            <div class="inline-form hidden" id="pasteForm">
+              <div class="preview-line" id="pasteHelp"></div>
+              <textarea id="pasteText" class="paste-text" rows="7" spellcheck="false"></textarea>
+              <div class="paste-result" id="pasteResult"></div>
+              <div class="row">
+                <button id="pasteCheck" type="button">Check</button>
+                <button id="pasteAdd" type="button" class="primary">Add them</button>
+                <button id="pasteCancel" type="button">Cancel</button>
+              </div>
+            </div>
+
+            <div class="dev-sub active" id="devScreens">
+              <div class="dev-toolbar">
+                <button type="button" id="addScreenBtn" class="primary">Add screen</button>
+                <button type="button" id="pasteScreensBtn">Paste a list</button>
+                <input
+                  type="text"
+                  class="activity-filter"
+                  id="screenFilter"
+                  placeholder="Filter screens (name, space, IP)"
+                />
+              </div>
+              <div class="inline-form hidden" id="screenForm">
+                <input type="hidden" id="sfOrig" />
+                <div class="field">
+                  <label for="sfName">Name</label>
+                  <input id="sfName" type="text" autocomplete="off" />
+                </div>
+                <div class="field">
+                  <label for="sfSpace">Space</label>
+                  <select id="sfSpace"></select>
+                  <input
+                    id="sfSpaceNew"
+                    type="text"
+                    class="hidden new-space-input"
+                    placeholder="New space name"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="field">
+                  <label for="sfIp">IP address</label>
+                  <input
+                    id="sfIp"
+                    type="text"
+                    autocomplete="off"
+                    inputmode="decimal"
+                    spellcheck="false"
+                  />
+                </div>
+                <div class="field">
+                  <label for="sfTv">TV power</label>
+                  <select id="sfTv">
+                    <option value="">Not set up</option>
+                    <option value="lg">LG TV (serial)</option>
+                  </select>
+                </div>
+                <div class="field" id="sfSetIdField">
+                  <label for="sfSetId">LG Set ID (leave blank for 00 = all sets)</label>
+                  <input
+                    id="sfSetId"
+                    type="text"
+                    maxlength="2"
+                    autocomplete="off"
+                    spellcheck="false"
+                  />
+                </div>
+                <div class="form-error" id="sfError"></div>
+                <div class="dev-test" id="sfTest"></div>
+                <div class="row">
+                  <button id="sfSave" type="button" class="primary">Save screen</button>
+                  <button id="sfTestBtn" type="button">Test</button>
+                  <button id="sfCancel" type="button">Cancel</button>
+                </div>
+              </div>
+              <div id="screensList"></div>
+            </div>
+
+            <div class="dev-sub" id="devSources">
+              <div class="dev-toolbar">
+                <button type="button" id="addSourceBtn" class="primary">Add source</button>
+                <button type="button" id="pasteSourcesBtn">Paste a list</button>
+              </div>
+              <div class="inline-form hidden" id="sourceForm">
+                <input type="hidden" id="srOrig" />
+                <div class="field">
+                  <label for="srName">Name</label>
+                  <input id="srName" type="text" autocomplete="off" />
+                </div>
+                <div class="field">
+                  <label for="srIp">IP address</label>
+                  <input
+                    id="srIp"
+                    type="text"
+                    autocomplete="off"
+                    inputmode="decimal"
+                    spellcheck="false"
+                  />
+                </div>
+                <div class="field">
+                  <label>Input switching</label>
+                  <div class="preview-line">
+                    Tick the inputs staff may choose between. Leave all unticked if this encoder has
+                    just one input. This applies to E5200 encoders.
+                  </div>
+                  <div class="checkbox-grid" id="srInputs">
+                    <label><input type="checkbox" value="HDMI1" /> HDMI 1</label>
+                    <label><input type="checkbox" value="HDMI2" /> HDMI 2</label>
+                    <label><input type="checkbox" value="USB-C" /> USB-C</label>
+                    <label><input type="checkbox" value="AUTO" /> Auto</label>
+                  </div>
+                </div>
+                <div class="form-error" id="srError"></div>
+                <div class="dev-test" id="srTest"></div>
+                <div class="row">
+                  <button id="srSave" type="button" class="primary">Save source</button>
+                  <button id="srTestBtn" type="button">Test</button>
+                  <button id="srCancel" type="button">Cancel</button>
+                </div>
+              </div>
+              <div id="sourcesList"></div>
+            </div>
+
+            <div class="dev-sub" id="devSpaces">
+              <div class="dev-toolbar">
+                <button type="button" id="addSpaceBtn" class="primary">Add space</button>
+              </div>
+              <div class="inline-form hidden" id="spaceForm">
+                <div class="field">
+                  <label for="spName">Space name</label>
+                  <input id="spName" type="text" autocomplete="off" />
+                </div>
+                <div class="form-error" id="spError"></div>
+                <div class="row">
+                  <button id="spSave" type="button" class="primary">Add space</button>
+                  <button id="spCancel" type="button">Cancel</button>
+                </div>
+              </div>
+              <div class="preview-line">
+                A new space starts empty. To put a screen in it, edit the screen and pick the space.
+                Renaming a space updates every group that uses it, so nobody loses access. Only an
+                empty space can be deleted.
+              </div>
+              <div id="spacesList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

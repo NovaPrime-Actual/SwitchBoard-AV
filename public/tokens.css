@@ -1,0 +1,155 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+
+/* ===========================================
+   SWITCHBOARD-AV — design tokens
+   The only file that holds raw colours and sizes; style.css refers to them with var().
+   Two tiers: --palette-* hold raw values, every other token points at them.
+   Branding: only --accent, --accent-tint, --select and --select-tint change per install.
+   The server writes them to /branding.css, which index.html loads after style.css, so the
+   values here are the defaults used until then.
+
+   Breakpoint (custom properties cannot be used in media queries, so it is written out in
+   style.css): phone first, the wide layout starts at min-width 45rem.
+   =========================================== */
+
+:root {
+  color-scheme: dark; /* dark scrollbars and native controls */
+
+  /* ----- palette (primitives) ----- */
+  --palette-ink-950: #0f0e0d;
+  --palette-ink-900: #201e1c;
+  --palette-ink-800: #302e2c;
+  --palette-ink-700: #3b3835;
+  --palette-ink-650: #47433f;
+  --palette-ink-600: #4c4945;
+  --palette-paper-100: #ece9e6;
+  --palette-slate-300: #a2aaad;
+  --palette-slate-400: #8b9097;
+  --palette-slate-600: #59606b;
+  --palette-red-300: #ca7477;
+  --palette-red-400: #f2828a;
+  --palette-red-700: #a6171d;
+  --palette-green-400: #6fcf8e;
+  --palette-amber-400: #e5c070;
+  --palette-white: #fff;
+  --palette-black: #000;
+
+  /* ----- colour roles ----- */
+  --accent: var(--palette-slate-600);
+  --accent-tint: var(
+    --palette-slate-400
+  ); /* lighter accent for text and focus rings on the dark page */
+
+  --select: var(--palette-red-700); /* highlight for selected things */
+  --select-tint: var(--palette-red-300);
+  --surface-0: var(--palette-ink-900); /* page background */
+  --surface-1: var(--palette-ink-800);
+  --surface-2: var(--palette-ink-700);
+  --surface-3: var(--palette-ink-650); /* button hover */
+  --surface-log: var(--palette-ink-950);
+  --border: var(--palette-ink-600);
+  --text: var(--palette-paper-100);
+  --text-dim: var(--palette-slate-300);
+  --text-on-accent: var(
+    --palette-white
+  ); /* the Branding tab refuses colours that white text can't be read on */
+
+  --ok: var(--palette-green-400);
+  --bad: var(--palette-red-400);
+  --wait: var(--palette-amber-400);
+  --scrim: rgb(0 0 0 / 60%); /* behind a popup */
+  --on-accent-wash: rgb(255 255 255 / 8%); /* header buttons */
+  --on-accent-wash-hover: rgb(255 255 255 / 18%);
+  --on-accent-outline: rgb(255 255 255 / 35%);
+  --on-accent-outline-strong: rgb(255 255 255 / 50%);
+  --on-accent-dim: rgb(255 255 255 / 75%);
+  --corner-note-surface: rgb(32 30 28 / 88%);
+  --shadow-menu: 0 8px 24px rgb(0 0 0 / 50%);
+  --selected-mix: 28%; /* how far a selected tile is tinted toward the highlight colour */
+
+  /* ----- type ----- */
+  --font-body: verdana, geneva, sans-serif;
+  --font-mono: consolas, monospace;
+  --font-size-xs: 0.6875rem;
+  --font-size-sm: 0.75rem;
+  --font-size-md: 0.8125rem;
+  --font-size-lg: 0.875rem;
+  --font-size-xl: 0.9375rem;
+  --font-size-2xl: 1rem;
+  --font-size-3xl: 1.125rem;
+  --font-size-4xl: 1.25rem;
+  --font-weight-strong: 600;
+  --line-height-code: 1.5;
+  --letter-spacing-caps: 0.04em;
+
+  /* ----- spacing steps, smallest to largest ----- */
+  --space-1: 0.125rem;
+  --space-2: 0.25rem;
+  --space-3: 0.375rem;
+  --space-4: 0.5rem;
+  --space-5: 0.625rem;
+  --space-6: 0.75rem;
+  --space-7: 0.875rem;
+  --space-8: 1rem;
+  --space-9: 1.125rem;
+  --space-10: 1.25rem;
+  --space-11: 1.75rem;
+  --space-12: 1.875rem;
+  --space-13: 2.5rem;
+  --space-14: 3rem;
+
+  /* ----- shape ----- */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.625rem;
+  --radius-xl: 0.75rem;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+  --selected-ring-width: 2px;
+
+  /* ----- component sizes ----- */
+  --control-height: 2.75rem; /* also the touch-target minimum */
+  --control-height-compact: 2.5rem;
+  --control-height-tab: 2.375rem;
+  --control-height-row: 2.25rem;
+  --checkbox-size: 1.375rem;
+  --swatch-width: 3.5rem;
+  --message-height: 1.125rem;
+  --header-height: 3.8125rem;
+  --logo-height: 2.5rem;
+  --logo-max-width: 7.5rem;
+  --login-logo-max-height: 6rem;
+  --nav-width: 12.5rem;
+  --menu-min-width: 12.5rem;
+  --menu-button-max-width: 60vw;
+  --card-width: 22.5rem;
+  --modal-width: 56.25rem;
+  --modal-width-narrow: 26.25rem;
+  --modal-max-height: 90vh;
+  --empty-state-max-width: 30rem;
+  --tile-min-height: 5.75rem;
+  --tile-grid-min: 11.875rem;
+  --choice-grid-min: 10rem; /* source buttons and tick lists */
+  --choice-min-width: 5.5rem;
+  --power-button-min-width: 4.75rem;
+  --field-min-width: 8.75rem;
+  --filter-min-width: 10rem;
+  --picker-min-width: 11.25rem;
+  --hex-input-max-width: 8.75rem;
+  --checkbox-grid-max-height: 13.75rem;
+  --log-min-height: 10rem;
+  --log-max-height: 40vh;
+  --activity-max-height: 55vh;
+  --source-min-height: 3.5rem;
+
+  /* ----- layers, effects ----- */
+  --z-corner-note: 4;
+  --z-header: 5;
+  --z-modal: 10;
+  --z-menu: 20;
+  --opacity-disabled: 0.5;
+  --opacity-unselectable: 0.4;
+  --hover-brightness: 1.2;
+}

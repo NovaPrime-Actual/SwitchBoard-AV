@@ -1,0 +1,30 @@
+{
+  "name": "switchboard-av",
+  "version": "2.12.0",
+  "private": true,
+  "description": "Web app that lets staff change the source on Visionary Solutions PacketAV decoders.",
+  "license": "AGPL-3.0-or-later",
+  "author": "Brett Cupp",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run-all.js",
+    "format": "prettier --config config/prettierrc.json --ignore-path config/prettierignore --write \"**/*.{js,css,html,json,yml}\"",
+    "format:check": "prettier --config config/prettierrc.json --ignore-path config/prettierignore --check \"**/*.{js,css,html,json,yml}\"",
+    "lint": "eslint --config config/eslint.config.js . && stylelint --config config/stylelintrc.json \"public/**/*.css\" && html-validate --config config/htmlvalidate.json public/index.html",
+    "check": "npm run format:check && npm run lint && npm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.14.0",
+    "globals": "17.14.0",
+    "html-validate": "11.18.0",
+    "prettier": "3.9.10",
+    "stylelint": "17.16.0",
+    "stylelint-config-recess-order": "7.10.0",
+    "stylelint-config-standard": "40.0.0"
+  }
+}
