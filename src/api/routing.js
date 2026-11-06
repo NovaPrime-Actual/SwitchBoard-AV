@@ -22,6 +22,7 @@ import {
   inputControlEncoderSet,
   multiSwitchDecoderSet,
   screenControlDecoderSet,
+  sourceFitsScreen,
   tvPowerDecoderSet,
   visibleDecoderSet,
   visibleSourceSet,
@@ -77,6 +78,8 @@ export async function handleRoute(req, res, user) {
   }
   if (!visibleSourceSet(user).has(encoder.ip))
     return reply(res, 403, { error: "That source is outside your access" });
+  if (decoders.some((d) => !sourceFitsScreen(encoder, d)))
+    return reply(res, 403, { error: `${encoder.name} is only for screens in ${encoder.space}` });
   if (decoders.length > 1) {
     const multi = multiSwitchDecoderSet(user);
     if (decoders.some((d) => !multi.has(d.ip)))

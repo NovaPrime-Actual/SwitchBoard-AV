@@ -594,11 +594,19 @@ function renderSources() {
     $("modalTitle").textContent = `${d.name.replace(/_/g, "_​")} — choose a source`;
   }
   clear(sourcesEl);
-  if (data.sources.length === 0) {
+  // Shared sources first; local sources (tied to a space) only when every chosen screen is in that space,
+  // under their own heading per space.
+  const targetIps = isBatchMode ? [...selected] : [openDecoderIp];
+  const targetSpaces = new Set(
+    targetIps.map((ip) => (data.decoders.find((x) => x.ip === ip) || {}).space),
+  );
+  const shared = data.sources.filter((s) => !s.space);
+  const local = data.sources.filter((s) => s.space && targetSpaces.size === 1 && targetSpaces.has(s.space));
+  if (shared.length === 0 && local.length === 0) {
     sourcesEl.append(el("div", { className: "sub", text: "No sources are available to you." }));
     return;
   }
-  for (const s of data.sources) {
+  const addButton = (s) => {
     const btn = el("button", {
       className: "src" + (currentHost === s.ip ? " current" : ""),
       text: s.name,
@@ -609,6 +617,11 @@ function renderSources() {
       guarded(() => takeRoute(s.ip)),
     );
     sourcesEl.append(btn);
+  };
+  shared.forEach(addButton);
+  if (local.length) {
+    sourcesEl.append(el("div", { className: "sub", text: `${local[0].space} only` }));
+    local.forEach(addButton);
   }
 }
 
@@ -2042,6 +2055,7 @@ function sourceRow(s) {
     guarded(() => deleteDevice("encoders", s, "source")),
   );
   const chips = [el("span", { className: "chip", text: s.ip })];
+  if (s.space) chips.push(el("span", { className: "chip role-admin", text: `Local to ${s.space}` }));
   if (s.inputs && s.inputs.length)
     chips.push(
       el("span", {
@@ -2065,11 +2079,21 @@ function renderSourcesList() {
   for (const s of devs.encoders) box.append(sourceRow(s));
 }
 
+// "Local to space" dropdown on the source form: blank = a shared source.
+function fillSourceSpaceSelect(selected) {
+  const sel = $("srSpace");
+  clear(sel);
+  sel.append(new Option("Shared — all spaces", ""));
+  for (const s of devs.spaces) sel.append(new Option(s, s));
+  sel.value = selected && devs.spaces.includes(selected) ? selected : "";
+}
+
 function openSourceForm(s) {
   $("pasteForm").classList.add("hidden");
   $("srOrig").value = s ? s.ip : "";
   $("srName").value = s ? s.name : "";
   $("srIp").value = s ? s.ip : "";
+  fillSourceSpaceSelect(s && s.space);
   $("srInputs")
     .querySelectorAll("input")
     .forEach((cb) => (cb.checked = !!(s && s.inputs && s.inputs.includes(cb.value))));
@@ -2095,6 +2119,7 @@ $("srSave").addEventListener(
     const body = {
       name: $("srName").value,
       ip: $("srIp").value.trim(),
+      space: $("srSpace").value,
       inputs: [...$("srInputs").querySelectorAll("input:checked")].map((cb) => cb.value),
     };
     try {

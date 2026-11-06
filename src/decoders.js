@@ -229,9 +229,12 @@ export function healthScope(user) {
     if (g.sources === "all") allSources = true;
     else for (const ip of g.sources || []) srcIps.add(ip);
   }
+  const spaces = new Set(config.decoders.filter((d) => decIps.has(d.ip)).map((d) => d.space));
   return {
     decoders: config.decoders.filter((d) => decIps.has(d.ip)),
-    encoders: config.encoders.filter((e) => allSources || srcIps.has(e.ip)),
+    encoders: config.encoders.filter((e) =>
+      e.space ? spaces.has(e.space) : allSources || srcIps.has(e.ip),
+    ),
     key: `user:${user.username}`,
   };
 }
