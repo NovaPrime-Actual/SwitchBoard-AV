@@ -407,9 +407,40 @@ function nowLabel(d) {
   return "Other source";
 }
 
+// The search box lives on the All tab only, in the same row as "Select several screens". It is one
+// long-lived element (re-attached on each redraw) so typing is not interrupted. Every word typed must appear
+// somewhere in a screen's name, space (or IP, which managers and admins can see on the tile), in any order,
+// ignoring case and accents ("cafe" finds "Café").
+const searchInput = document.createElement("input");
+searchInput.type = "search";
+searchInput.className = "activity-filter screen-search";
+searchInput.placeholder = "Search screens";
+searchInput.autocomplete = "off";
+searchInput.setAttribute("aria-label", "Search screens");
+searchInput.addEventListener("input", () => data && renderTiles());
+
+const fold = (t) =>
+  String(t)
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase();
+
+function searchWords() {
+  return selectedSpace === ALL_SPACES ? fold(searchInput.value).split(/s+/).filter(Boolean) : [];
+}
+
+function matchesSearch(d, words) {
+  const parts = [d.name, d.space];
+  if (me.role !== "user") parts.push(d.ip);
+  const text = fold(parts.join(" "));
+  return words.every((w) => text.includes(w));
+}
+
 function renderTiles() {
   renderSpaces();
   updateInputsMenu();
+  const searchHadFocus = document.activeElement === searchInput;
+  const caret = searchInput.selectionStart;
   clear(grid);
   if (data.decoders.length === 0) {
     grid.append(
@@ -421,16 +452,30 @@ function renderTiles() {
     return;
   }
   for (const ip of [...selected]) if (!data.decoders.some((d) => d.ip === ip)) selected.delete(ip); // screen went away
-  const shown = data.decoders.filter(
+  const words = searchWords();
+  const inSpace = data.decoders.filter(
     (d) => selectedSpace === ALL_SPACES || d.space === selectedSpace,
   );
+  const shown = words.length ? inSpace.filter((d) => matchesSearch(d, words)) : inSpace;
   // "Select several" is a group permission: leave select mode if it no longer applies, and only offer it
   // when at least two of the screens being shown may be picked together.
   if (isSelectMode && !data.decoders.some((d) => d.canMulti)) {
     isSelectMode = false;
     selected.clear();
   }
-  if (shown.filter((d) => d.canMulti).length > 1 || isSelectMode) grid.append(selectBar(shown));
+  const showSearch = selectedSpace === ALL_SPACES;
+  const showSelect = inSpace.filter((d) => d.canMulti).length > 1 || isSelectMode;
+  if (showSelect || showSearch) {
+    const bar = showSelect ? selectBar(shown) : el("div", { className: "select-bar" });
+    if (showSearch) bar.append(searchInput);
+    grid.append(bar);
+    if (searchHadFocus && showSearch) {
+      searchInput.focus();
+      searchInput.setSelectionRange(caret, caret);
+    }
+  }
+  if (words.length && shown.length === 0)
+    grid.append(el("div", { className: "empty-state" }, [el("div", { text: "No screens match." })]));
   for (const d of shown) {
     const isPicked = isSelectMode && selected.has(d.ip);
     const blank =

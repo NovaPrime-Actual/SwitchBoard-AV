@@ -549,6 +549,13 @@ nav button span {
   padding: var(--space-3) var(--space-7);
 }
 
+/* the All tab's search box, in the same row as the Select several button */
+.select-bar .screen-search {
+  flex: 1;
+  min-width: 12rem;
+  max-width: 24rem;
+}
+
 .select-count {
   margin-right: var(--space-2);
   font-size: var(--font-size-lg);
