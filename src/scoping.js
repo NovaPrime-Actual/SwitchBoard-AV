@@ -79,12 +79,18 @@ export function inputControlEncoderSet(user) {
   if (user.role === "admin") return new Set(switchable.map((e) => e.ip));
   let all = false;
   const allowed = new Set();
+  const localSpaces = new Set(); // spaces of groups ticked "can change source inputs"
   for (const g of userGroupObjects(user)) {
     if (!g.inputControl) continue;
+    for (const ip of groupDecoderSet(g)) localSpaces.add(spaceOfDecoder(ip));
     if (g.sources === "all") all = true;
     else for (const ip of g.sources || []) allowed.add(ip);
   }
-  return new Set(switchable.filter((e) => all || allowed.has(e.ip)).map((e) => e.ip));
+  return new Set(
+    switchable
+      .filter((e) => (e.space ? localSpaces.has(e.space) : all || allowed.has(e.ip)))
+      .map((e) => e.ip),
+  );
 }
 
 // Screens this user may switch together with others ("select several"): every screen for an admin, otherwise
@@ -123,6 +129,18 @@ export function tvPowerDecoderSet(user) {
   return new Set(supported.filter((d) => allowed.has(d.ip)).map((d) => d.ip));
 }
 
+function spaceOfDecoder(ip) {
+  const d = config.decoders.find((x) => x.ip === ip);
+  return d ? d.space : undefined;
+}
+
+// A LOCAL source (encoder with a "space") may only be shown on, and switched onto, screens in that space.
+export function sourceFitsScreen(encoder, decoder) {
+  return !encoder.space || encoder.space === decoder.space;
+}
+
+// Shared sources come from the groups' source lists ("all sources" never includes local ones). Local sources
+// are separate: a person gets one when they can see at least one screen in its space.
 export function visibleSourceSet(user) {
   if (user.role === "admin") return new Set(config.encoders.map((e) => e.ip));
   let sawAll = false;
@@ -134,7 +152,12 @@ export function visibleSourceSet(user) {
     }
     for (const ip of g.sources || []) set.add(ip);
   }
-  return sawAll ? new Set(config.encoders.map((e) => e.ip)) : set;
+  const mySpaces = new Set([...visibleDecoderSet(user)].map(spaceOfDecoder));
+  return new Set(
+    config.encoders
+      .filter((e) => (e.space ? mySpaces.has(e.space) : sawAll || set.has(e.ip)))
+      .map((e) => e.ip),
+  );
 }
 
 export function activeAdminCount(excludeId) {

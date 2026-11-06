@@ -92,6 +92,7 @@ export function snapshot(user) {
         return {
           ip: e.ip,
           name: e.name,
+          space: e.space || null, // set = a local source, only for screens in that space
           canInput: can,
           inputs: can ? e.inputs : [],
           input: can && inputState.has(e.ip) ? inputState.get(e.ip).input : null,

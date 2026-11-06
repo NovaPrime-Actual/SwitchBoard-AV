@@ -476,6 +476,16 @@ nav button span {
   overflow-y: auto;
 }
 
+/* Full-width labelled divider between the shared sources and a space's local ones. */
+.src-group {
+  grid-column: 1 / -1;
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: var(--border-width) solid var(--border);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+}
+
 .src {
   min-height: var(--source-min-height);
   padding: var(--space-7) var(--space-5);
@@ -537,6 +547,13 @@ nav button span {
 .select-bar button {
   min-height: var(--control-height);
   padding: var(--space-3) var(--space-7);
+}
+
+/* the All tab's search box, in the same row as the Select several button */
+.select-bar .screen-search {
+  flex: 1;
+  min-width: 12rem;
+  max-width: 24rem;
 }
 
 .select-count {
