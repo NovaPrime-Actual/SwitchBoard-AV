@@ -476,6 +476,16 @@ nav button span {
   overflow-y: auto;
 }
 
+/* Full-width labelled divider between the shared sources and a space's local ones. */
+.src-group {
+  grid-column: 1 / -1;
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: var(--border-width) solid var(--border);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+}
+
 .src {
   min-height: var(--source-min-height);
   padding: var(--space-7) var(--space-5);

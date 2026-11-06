@@ -620,7 +620,7 @@ function renderSources() {
   };
   shared.forEach(addButton);
   if (local.length) {
-    sourcesEl.append(el("div", { className: "sub", text: `${local[0].space} only` }));
+    sourcesEl.append(el("div", { className: "src-group", text: `${local[0].space} only` }));
     local.forEach(addButton);
   }
 }
