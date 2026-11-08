@@ -2,9 +2,11 @@
 
 SwitchBoard-AV, newest first.
 
-## Unreleased
+## v2.14 (11/08/26)
 
+- **Search on the All tab.** A search box beside "Select several screens", on the All tab only. Every word typed must match the screen name or space (or IP, for managers and admins), in any order, ignoring case and accents. Screens the search hides are dropped from a "Select several" selection, so a batch switch never reaches a screen you cannot see.
 - **Local sources.** A source can be made local to one space (Devices > Sources > Local to space). It is only offered, and only accepted by the server, for screens in that space, shown under its own "<space> only" heading in the source popup. Local sources are not part of any group's source list or "All sources": anyone who can see a screen in that space gets them. Renaming a space renames its local sources, and a space with local sources cannot be deleted.
+- Development tooling only: `minimatch` is pinned to 11.0.1 to close a Dependabot alert. Nothing that ships in the app changed.
 
 ## v2.13 (11/05/26)
 

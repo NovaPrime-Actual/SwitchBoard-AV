@@ -37,7 +37,7 @@ export const HEALTH_CONCURRENCY = 24;
 export const MAX_BATCH_SCREENS = 100;
 
 // most screens one "switch several at once" request may include
-export const APP_VERSION = "2.13";
+export const APP_VERSION = "2.14";
 
 // shown in the About window; keep in step with the version line in the header comment
 // The code's own notice, shown in the About window (the AGPL asks interactive programs to show the copyright, the
