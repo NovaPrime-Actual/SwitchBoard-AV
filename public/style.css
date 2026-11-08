@@ -479,11 +479,11 @@ nav button span {
 /* Full-width labelled divider between the shared sources and a space's local ones. */
 .src-group {
   grid-column: 1 / -1;
-  margin-top: var(--space-5);
   padding-top: var(--space-5);
-  border-top: var(--border-width) solid var(--border);
+  margin-top: var(--space-5);
   font-size: var(--font-size-xl);
   font-weight: 600;
+  border-top: var(--border-width) solid var(--border);
 }
 
 .src {
