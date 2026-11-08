@@ -407,9 +407,36 @@ function nowLabel(d) {
   return "Other source";
 }
 
+// The search box lives on the All tab only, in the same row as "Select several screens". It is one
+// long-lived element (re-attached on each redraw) so typing is not interrupted. Every word typed must appear
+// somewhere in a screen's name, space (or IP, which managers and admins can see on the tile), in any order,
+// ignoring case and accents ("cafe" finds "Café").
+const searchInput = document.createElement("input");
+searchInput.type = "search";
+searchInput.className = "activity-filter screen-search";
+searchInput.placeholder = "Search screens";
+searchInput.autocomplete = "off";
+searchInput.setAttribute("aria-label", "Search screens");
+searchInput.addEventListener("input", () => data && renderTiles());
+
+const fold = (t) => String(t).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+function searchWords() {
+  return selectedSpace === ALL_SPACES ? fold(searchInput.value).split(/\s+/).filter(Boolean) : [];
+}
+
+function matchesSearch(d, words) {
+  const parts = [d.name, d.space];
+  if (me.role !== "user") parts.push(d.ip);
+  const text = fold(parts.join(" "));
+  return words.every((w) => text.includes(w));
+}
+
 function renderTiles() {
   renderSpaces();
   updateInputsMenu();
+  const searchHadFocus = document.activeElement === searchInput;
+  const caret = searchInput.selectionStart;
   clear(grid);
   if (data.decoders.length === 0) {
     grid.append(
@@ -421,16 +448,35 @@ function renderTiles() {
     return;
   }
   for (const ip of [...selected]) if (!data.decoders.some((d) => d.ip === ip)) selected.delete(ip); // screen went away
-  const shown = data.decoders.filter(
+  const words = searchWords();
+  const inSpace = data.decoders.filter(
     (d) => selectedSpace === ALL_SPACES || d.space === selectedSpace,
   );
+  const shown = words.length ? inSpace.filter((d) => matchesSearch(d, words)) : inSpace;
+  // A screen the search hides must not stay picked: a batch switch would still go to it, unseen.
+  if (words.length)
+    for (const ip of [...selected]) if (!shown.some((d) => d.ip === ip)) selected.delete(ip);
   // "Select several" is a group permission: leave select mode if it no longer applies, and only offer it
   // when at least two of the screens being shown may be picked together.
   if (isSelectMode && !data.decoders.some((d) => d.canMulti)) {
     isSelectMode = false;
     selected.clear();
   }
-  if (shown.filter((d) => d.canMulti).length > 1 || isSelectMode) grid.append(selectBar(shown));
+  const showSearch = selectedSpace === ALL_SPACES;
+  const showSelect = inSpace.filter((d) => d.canMulti).length > 1 || isSelectMode;
+  if (showSelect || showSearch) {
+    const bar = showSelect ? selectBar(shown) : el("div", { className: "select-bar" });
+    if (showSearch) bar.append(searchInput);
+    grid.append(bar);
+    if (searchHadFocus && showSearch) {
+      searchInput.focus();
+      searchInput.setSelectionRange(caret, caret);
+    }
+  }
+  if (words.length && shown.length === 0)
+    grid.append(
+      el("div", { className: "empty-state" }, [el("div", { text: "No screens match." })]),
+    );
   for (const d of shown) {
     const isPicked = isSelectMode && selected.has(d.ip);
     const blank =
@@ -594,11 +640,21 @@ function renderSources() {
     $("modalTitle").textContent = `${d.name.replace(/_/g, "_​")} — choose a source`;
   }
   clear(sourcesEl);
-  if (data.sources.length === 0) {
+  // Shared sources first; local sources (tied to a space) only when every chosen screen is in that space,
+  // under their own heading per space.
+  const targetIps = isBatchMode ? [...selected] : [openDecoderIp];
+  const targetSpaces = new Set(
+    targetIps.map((ip) => (data.decoders.find((x) => x.ip === ip) || {}).space),
+  );
+  const shared = data.sources.filter((s) => !s.space);
+  const local = data.sources.filter(
+    (s) => s.space && targetSpaces.size === 1 && targetSpaces.has(s.space),
+  );
+  if (shared.length === 0 && local.length === 0) {
     sourcesEl.append(el("div", { className: "sub", text: "No sources are available to you." }));
     return;
   }
-  for (const s of data.sources) {
+  const addButton = (s) => {
     const btn = el("button", {
       className: "src" + (currentHost === s.ip ? " current" : ""),
       text: s.name,
@@ -609,6 +665,11 @@ function renderSources() {
       guarded(() => takeRoute(s.ip)),
     );
     sourcesEl.append(btn);
+  };
+  shared.forEach(addButton);
+  if (local.length) {
+    sourcesEl.append(el("div", { className: "src-group", text: `${local[0].space} only` }));
+    local.forEach(addButton);
   }
 }
 
@@ -2042,6 +2103,8 @@ function sourceRow(s) {
     guarded(() => deleteDevice("encoders", s, "source")),
   );
   const chips = [el("span", { className: "chip", text: s.ip })];
+  if (s.space)
+    chips.push(el("span", { className: "chip role-admin", text: `Local to ${s.space}` }));
   if (s.inputs && s.inputs.length)
     chips.push(
       el("span", {
@@ -2065,11 +2128,21 @@ function renderSourcesList() {
   for (const s of devs.encoders) box.append(sourceRow(s));
 }
 
+// "Local to space" dropdown on the source form: blank = a shared source.
+function fillSourceSpaceSelect(selected) {
+  const sel = $("srSpace");
+  clear(sel);
+  sel.append(new Option("Shared — all spaces", ""));
+  for (const s of devs.spaces) sel.append(new Option(s, s));
+  sel.value = selected && devs.spaces.includes(selected) ? selected : "";
+}
+
 function openSourceForm(s) {
   $("pasteForm").classList.add("hidden");
   $("srOrig").value = s ? s.ip : "";
   $("srName").value = s ? s.name : "";
   $("srIp").value = s ? s.ip : "";
+  fillSourceSpaceSelect(s && s.space);
   $("srInputs")
     .querySelectorAll("input")
     .forEach((cb) => (cb.checked = !!(s && s.inputs && s.inputs.includes(cb.value))));
@@ -2095,6 +2168,7 @@ $("srSave").addEventListener(
     const body = {
       name: $("srName").value,
       ip: $("srIp").value.trim(),
+      space: $("srSpace").value,
       inputs: [...$("srInputs").querySelectorAll("input:checked")].map((cb) => cb.value),
     };
     try {

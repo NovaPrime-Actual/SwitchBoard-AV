@@ -128,7 +128,9 @@ The Devices tab has four parts:
   address, and TV power (None or LG, plus an optional Set ID). Screens are listed under their
   space, with a filter box.
 - **Sources** — add, edit and delete sources (name and IP), and tick which inputs an encoder offers
-  for input switching (see Source inputs).
+  for input switching (see Source inputs). Pick **Local to space** to make a source local: it is
+  only offered on screens in that space (under an "<space> only" heading), is never part of a
+  group's source list or "All sources", and goes to anyone who can see a screen in that space.
 - **Spaces** — **Add space**, rename a space, or delete one that is empty. A new space starts
   empty; to put a screen in it, edit the screen and pick the space from its dropdown. Every space
   a screen uses is listed automatically, and an empty space stays listed until you delete it, so

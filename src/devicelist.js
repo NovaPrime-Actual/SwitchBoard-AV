@@ -67,6 +67,10 @@ export function cleanDecoder(d) {
 // input switching.
 export function cleanEncoder(e) {
   const out = { name: String(e.name || "").trim(), ip: String(e.ip || "").trim() };
+  // "space" makes this a LOCAL source: only offered on screens in that space, and not part of any group's
+  // source list. No space = a shared source, as before.
+  const space = String(e.space || "").trim();
+  if (space) out.space = space;
   if (Array.isArray(e.inputs)) {
     const picked = INPUT_CHOICES.filter((v) => e.inputs.includes(v));
     if (picked.length) out.inputs = picked;
@@ -111,11 +115,12 @@ export function deviceListErrors(decoders, encoders) {
 
 // The spaces list is kept in order and always contains every space a screen uses, plus any space an
 // admin added on its own (an empty space, ready for screens). It only shrinks when a space is deleted.
-export function mergeSpaces(decoders, listed) {
+export function mergeSpaces(decoders, listed, encoders = []) {
   return [
     ...new Set([
       ...(listed || []).map((s) => String(s).trim()).filter(Boolean),
       ...decoders.map((d) => d.space),
+      ...encoders.map((e) => e.space).filter(Boolean),
     ]),
   ];
 }
@@ -124,21 +129,15 @@ function loadDeviceList() {
   const saved = loadJsonFile(DEVICES_STORE_PATH, null);
   if (saved) {
     const decoders = (saved.decoders || []).map(cleanDecoder);
-    return {
-      decoders,
-      encoders: (saved.encoders || []).map(cleanEncoder),
-      spaces: mergeSpaces(decoders, saved.spaces),
-    };
+    const encoders = (saved.encoders || []).map(cleanEncoder);
+    return { decoders, encoders, spaces: mergeSpaces(decoders, saved.spaces, encoders) };
   }
   // New server setup: import devices.json once (an empty list if the file is missing or unreadable).
   deviceListSource = "imported";
   const seedConfig = readSeedFile();
   const decoders = (seedConfig.decoders || []).map(cleanDecoder);
-  const list = {
-    decoders,
-    encoders: (seedConfig.encoders || []).map(cleanEncoder),
-    spaces: mergeSpaces(decoders, seedConfig.spaces),
-  };
+  const encoders = (seedConfig.encoders || []).map(cleanEncoder);
+  const list = { decoders, encoders, spaces: mergeSpaces(decoders, seedConfig.spaces, encoders) };
   atomicWrite(DEVICES_STORE_PATH, { updatedAt: Date.now(), ...list });
   return list;
 }
@@ -172,7 +171,7 @@ function recordDeviceHistory(by, reason) {
 // spaces: the next spaces list (defaults to the current one); every space a screen uses is added to it.
 export function commitDevices(decoders, encoders, { by, reason, cascade = {}, spaces }) {
   const errors = deviceListErrors(decoders, encoders);
-  const nextSpaces = mergeSpaces(decoders, spaces === undefined ? config.spaces : spaces);
+  const nextSpaces = mergeSpaces(decoders, spaces === undefined ? config.spaces : spaces, encoders);
   for (const s of nextSpaces)
     if (s.length > 64)
       errors.push(`Space name "${s.slice(0, 20)}..." is longer than 64 characters`);

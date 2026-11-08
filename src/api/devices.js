@@ -27,7 +27,7 @@ import { logActivity, saveStore, store } from "../store.js";
 
 const DEVICE_FIELDS = {
   decoders: ["name", "space", "ip", "tvPower", "tvSetId"],
-  encoders: ["name", "ip", "inputs"],
+  encoders: ["name", "ip", "inputs", "space"],
 };
 
 function parseDevicePaste(kind, text) {
@@ -103,7 +103,7 @@ function summarizeDeviceFile(list) {
   return {
     screens: list.decoders.length,
     sources: list.encoders.length,
-    spaces: mergeSpaces(list.decoders, list.spaces).length,
+    spaces: mergeSpaces(list.decoders, list.spaces, list.encoders).length,
     screensAdded: count(newScreens, nowScreens),
     screensRemoved: count(nowScreens, newScreens),
     sourcesAdded: count(newSources, nowSources),
@@ -197,6 +197,12 @@ export async function handleAdminDevices(req, res, user, rest) {
           throw new HttpError(400, `Unknown input "${bad[0]}" (use ${INPUT_CHOICES.join(", ")})`);
       }
 
+      // A local source must name a space that already exists (add it under Spaces first), so a typo or a
+      // different capitalisation cannot quietly create a second space.
+      const wantedSpace = !isDec && method !== "DELETE" ? String(pick.space || "").trim() : "";
+      if (wantedSpace && !config.spaces.includes(wantedSpace))
+        throw new HttpError(400, `No space called "${wantedSpace}". Add it under Spaces first`);
+
       let next;
       let reason;
       const cascade = {};
@@ -258,7 +264,8 @@ export async function handleAdminDevices(req, res, user, rest) {
       if (!config.spaces.includes(from)) throw new HttpError(404, `No space called "${from}"`);
       if (from === to) throw new HttpError(400, "That is already the name");
       const next = config.decoders.map((d) => (d.space === from ? { ...d, space: to } : d));
-      const r = commitDevices(next, config.encoders, {
+      const nextSources = config.encoders.map((e) => (e.space === from ? { ...e, space: to } : e));
+      const r = commitDevices(next, nextSources, {
         by: user.username,
         reason: `rename space ${from} -> ${to}`,
         cascade: { spaces: new Map([[from, to]]) },
@@ -276,6 +283,12 @@ export async function handleAdminDevices(req, res, user, rest) {
         throw new HttpError(
           400,
           `"${name}" still has ${n} screen${n === 1 ? "" : "s"}. Move or delete them first`,
+        );
+      const local = config.encoders.filter((e) => e.space === name).length;
+      if (local > 0)
+        throw new HttpError(
+          400,
+          `"${name}" still has ${local} local source${local === 1 ? "" : "s"}. Move or delete them first`,
         );
       const r = commitDevices(config.decoders, config.encoders, {
         by: user.username,
