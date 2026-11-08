@@ -426,7 +426,7 @@ const fold = (t) =>
     .toLowerCase();
 
 function searchWords() {
-  return selectedSpace === ALL_SPACES ? fold(searchInput.value).split(/s+/).filter(Boolean) : [];
+  return selectedSpace === ALL_SPACES ? fold(searchInput.value).split(/\s+/).filter(Boolean) : [];
 }
 
 function matchesSearch(d, words) {
@@ -457,6 +457,9 @@ function renderTiles() {
     (d) => selectedSpace === ALL_SPACES || d.space === selectedSpace,
   );
   const shown = words.length ? inSpace.filter((d) => matchesSearch(d, words)) : inSpace;
+  // A screen the search hides must not stay picked: a batch switch would still go to it, unseen.
+  if (words.length)
+    for (const ip of [...selected]) if (!shown.some((d) => d.ip === ip)) selected.delete(ip);
   // "Select several" is a group permission: leave select mode if it no longer applies, and only offer it
   // when at least two of the screens being shown may be picked together.
   if (isSelectMode && !data.decoders.some((d) => d.canMulti)) {

@@ -197,6 +197,12 @@ export async function handleAdminDevices(req, res, user, rest) {
           throw new HttpError(400, `Unknown input "${bad[0]}" (use ${INPUT_CHOICES.join(", ")})`);
       }
 
+      // A local source must name a space that already exists (add it under Spaces first), so a typo or a
+      // different capitalisation cannot quietly create a second space.
+      const wantedSpace = !isDec && method !== "DELETE" ? String(pick.space || "").trim() : "";
+      if (wantedSpace && !config.spaces.includes(wantedSpace))
+        throw new HttpError(400, `No space called "${wantedSpace}". Add it under Spaces first`);
+
       let next;
       let reason;
       const cascade = {};

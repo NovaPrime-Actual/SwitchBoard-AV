@@ -92,8 +92,6 @@ export function deviceErrors(d, kind) {
     if (d.tvSetId && !/^[0-9a-f]{2}$/i.test(d.tvSetId))
       errors.push(`${label}: TV Set ID must be two characters, like 00 or 01`);
   }
-  if (kind === "source" && d.space && d.space.length > 64)
-    errors.push(`${label}: space name is longer than 64 characters`);
   return errors;
 }
 

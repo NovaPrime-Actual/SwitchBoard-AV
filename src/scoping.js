@@ -79,13 +79,14 @@ export function inputControlEncoderSet(user) {
   if (user.role === "admin") return new Set(switchable.map((e) => e.ip));
   let all = false;
   const allowed = new Set();
-  const localSpaces = new Set(); // spaces of groups ticked "can change source inputs"
+  const controlled = new Set(); // screens of groups ticked "can change source inputs"
   for (const g of userGroupObjects(user)) {
     if (!g.inputControl) continue;
-    for (const ip of groupDecoderSet(g)) localSpaces.add(spaceOfDecoder(ip));
+    for (const ip of groupDecoderSet(g)) controlled.add(ip);
     if (g.sources === "all") all = true;
     else for (const ip of g.sources || []) allowed.add(ip);
   }
+  const localSpaces = spacesOfDecoders(controlled);
   return new Set(
     switchable
       .filter((e) => (e.space ? localSpaces.has(e.space) : all || allowed.has(e.ip)))
@@ -129,9 +130,9 @@ export function tvPowerDecoderSet(user) {
   return new Set(supported.filter((d) => allowed.has(d.ip)).map((d) => d.ip));
 }
 
-function spaceOfDecoder(ip) {
-  const d = config.decoders.find((x) => x.ip === ip);
-  return d ? d.space : undefined;
+// The spaces of the given screens (a set of IPs), found in one pass over the screen list.
+function spacesOfDecoders(ips) {
+  return new Set(config.decoders.filter((d) => ips.has(d.ip)).map((d) => d.space));
 }
 
 // A LOCAL source (encoder with a "space") may only be shown on, and switched onto, screens in that space.
@@ -152,7 +153,7 @@ export function visibleSourceSet(user) {
     }
     for (const ip of g.sources || []) set.add(ip);
   }
-  const mySpaces = new Set([...visibleDecoderSet(user)].map(spaceOfDecoder));
+  const mySpaces = spacesOfDecoders(visibleDecoderSet(user));
   return new Set(
     config.encoders
       .filter((e) => (e.space ? mySpaces.has(e.space) : sawAll || set.has(e.ip)))

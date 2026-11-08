@@ -105,6 +105,12 @@ function client() {
     space: "x".repeat(65),
   });
   check("overlong local space name is refused", r.status === 400, r.json);
+  r = await admin("POST", "/api/admin/devices/encoders", {
+    name: "Typo",
+    ip: "127.0.2.16",
+    space: "space a",
+  });
+  check("a space that does not exist exactly is refused", r.status === 400, r.json);
 
   const mk = async (name, spaces, sources) => {
     const g = (await admin("POST", "/api/admin/groups", { name, spaces, sources })).json;
@@ -135,7 +141,11 @@ function client() {
   r = await admin("POST", "/api/route", { decoderIp: "127.0.1.21", encoderIp: "127.0.2.14" });
   check("even an admin cannot put it on a screen in another space", r.status === 403, r.json);
   r = await a("POST", "/api/route", { decoderIp: "127.0.1.11", encoderIp: "127.0.2.14" });
-  check("space A user is allowed to route it on a space A screen", r.status !== 403, r.json);
+  check(
+    "space A user is allowed to route it on a space A screen",
+    r.status !== 403 && r.status !== 400,
+    r.json,
+  );
 
   r = await admin("DELETE", "/api/admin/devices/spaces/" + encodeURIComponent("Space A"));
   check("a space with screens or local sources cannot be deleted", r.status === 400, r.json);
