@@ -171,11 +171,7 @@ function recordDeviceHistory(by, reason) {
 // spaces: the next spaces list (defaults to the current one); every space a screen uses is added to it.
 export function commitDevices(decoders, encoders, { by, reason, cascade = {}, spaces }) {
   const errors = deviceListErrors(decoders, encoders);
-  const nextSpaces = mergeSpaces(
-    decoders,
-    spaces === undefined ? config.spaces : spaces,
-    encoders,
-  );
+  const nextSpaces = mergeSpaces(decoders, spaces === undefined ? config.spaces : spaces, encoders);
   for (const s of nextSpaces)
     if (s.length > 64)
       errors.push(`Space name "${s.slice(0, 20)}..." is longer than 64 characters`);

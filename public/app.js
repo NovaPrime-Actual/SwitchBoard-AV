@@ -419,11 +419,7 @@ searchInput.autocomplete = "off";
 searchInput.setAttribute("aria-label", "Search screens");
 searchInput.addEventListener("input", () => data && renderTiles());
 
-const fold = (t) =>
-  String(t)
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase();
+const fold = (t) => String(t).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 function searchWords() {
   return selectedSpace === ALL_SPACES ? fold(searchInput.value).split(/\s+/).filter(Boolean) : [];
@@ -478,7 +474,9 @@ function renderTiles() {
     }
   }
   if (words.length && shown.length === 0)
-    grid.append(el("div", { className: "empty-state" }, [el("div", { text: "No screens match." })]));
+    grid.append(
+      el("div", { className: "empty-state" }, [el("div", { text: "No screens match." })]),
+    );
   for (const d of shown) {
     const isPicked = isSelectMode && selected.has(d.ip);
     const blank =
@@ -649,7 +647,9 @@ function renderSources() {
     targetIps.map((ip) => (data.decoders.find((x) => x.ip === ip) || {}).space),
   );
   const shared = data.sources.filter((s) => !s.space);
-  const local = data.sources.filter((s) => s.space && targetSpaces.size === 1 && targetSpaces.has(s.space));
+  const local = data.sources.filter(
+    (s) => s.space && targetSpaces.size === 1 && targetSpaces.has(s.space),
+  );
   if (shared.length === 0 && local.length === 0) {
     sourcesEl.append(el("div", { className: "sub", text: "No sources are available to you." }));
     return;
@@ -2103,7 +2103,8 @@ function sourceRow(s) {
     guarded(() => deleteDevice("encoders", s, "source")),
   );
   const chips = [el("span", { className: "chip", text: s.ip })];
-  if (s.space) chips.push(el("span", { className: "chip role-admin", text: `Local to ${s.space}` }));
+  if (s.space)
+    chips.push(el("span", { className: "chip role-admin", text: `Local to ${s.space}` }));
   if (s.inputs && s.inputs.length)
     chips.push(
       el("span", {

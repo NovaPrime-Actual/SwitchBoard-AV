@@ -90,7 +90,10 @@ function client() {
   const admin = client();
   const pw = /temporary password: (\S+)/.exec(out)[1];
   await admin("POST", "/api/login", { username: "admin", password: pw });
-  await admin("POST", "/api/change-password", { currentPassword: pw, newPassword: "admin-test-pass-1" });
+  await admin("POST", "/api/change-password", {
+    currentPassword: pw,
+    newPassword: "admin-test-pass-1",
+  });
   await admin("POST", "/api/login", { username: "admin", password: "admin-test-pass-1" });
 
   let r = await admin("POST", "/api/admin/devices/encoders", {
@@ -115,11 +118,19 @@ function client() {
   const mk = async (name, spaces, sources) => {
     const g = (await admin("POST", "/api/admin/groups", { name, spaces, sources })).json;
     const u = (
-      await admin("POST", "/api/admin/users", { name, username: name.toLowerCase(), role: "user", groups: [g.id] })
+      await admin("POST", "/api/admin/users", {
+        name,
+        username: name.toLowerCase(),
+        role: "user",
+        groups: [g.id],
+      })
     ).json;
     const c = client();
     await c("POST", "/api/login", { username: name.toLowerCase(), password: u.tempPassword });
-    await c("POST", "/api/change-password", { currentPassword: u.tempPassword, newPassword: "user-test-pass-1" });
+    await c("POST", "/api/change-password", {
+      currentPassword: u.tempPassword,
+      newPassword: "user-test-pass-1",
+    });
     await c("POST", "/api/login", { username: name.toLowerCase(), password: "user-test-pass-1" });
     return c;
   };
@@ -131,10 +142,18 @@ function client() {
   const bNames = await names(b);
   check("space A user sees the local source", aNames.includes("Space A Laptop"), aNames);
   check("space B user does not see it", !bNames.includes("Space A Laptop"), bNames);
-  check("shared sources still visible to both", aNames.includes("Source 1") && bNames.includes("Source 1"), [aNames, bNames]);
+  check(
+    "shared sources still visible to both",
+    aNames.includes("Source 1") && bNames.includes("Source 1"),
+    [aNames, bNames],
+  );
 
   const noAll = await mk("Charlie", ["Space B"], ["127.0.2.14"]);
-  check("naming a local source in a group's list does not grant it", !(await names(noAll)).includes("Space A Laptop"), await names(noAll));
+  check(
+    "naming a local source in a group's list does not grant it",
+    !(await names(noAll)).includes("Space A Laptop"),
+    await names(noAll),
+  );
 
   r = await b("POST", "/api/route", { decoderIp: "127.0.1.21", encoderIp: "127.0.2.14" });
   check("space B user cannot route the local source", r.status === 403, r.json);
