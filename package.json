@@ -17,6 +17,9 @@
     "lint": "eslint --config config/eslint.config.js . && stylelint --config config/stylelintrc.json \"public/**/*.css\" && html-validate --config config/htmlvalidate.json public/index.html",
     "check": "npm run format:check && npm run lint && npm test"
   },
+  "overrides": {
+    "minimatch": "11.0.1"
+  },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "eslint": "10.14.0",
