@@ -79,6 +79,7 @@
     rgb(0 0 0 / 12%)
   ); /* depth over whatever the accent is */
 
+  --nav-hover-mix: 40%; /* how far a space button is tinted toward the accent colour when pointed at */
   --nav-active-mix: 22%; /* how far the open space's button is tinted toward the highlight colour */
   --selected-mix: 28%; /* how far a selected tile is tinted toward the highlight colour */
 

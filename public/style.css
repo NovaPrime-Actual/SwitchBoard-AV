@@ -417,8 +417,10 @@ nav button {
   box-shadow: none;
 }
 
+/* pointing at a space tints it toward the accent colour, so it follows the Branding tab */
 nav button:hover:not(:disabled, .active) {
-  background: var(--surface-2);
+  background: var(--surface-2); /* fallback */
+  background: color-mix(in srgb, var(--accent) var(--nav-hover-mix), var(--surface-1));
 }
 
 /* the open space: a soft tint of the highlight colour with a bar in the full colour
