@@ -44,10 +44,12 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
+          # The image's version label comes from the highest-priority tag, so the numbered tags outrank
+          # "latest" (otherwise a manual run labelled the image "latest" instead of 2.15).
           tags: |
-            type=match,pattern=v(.*),group=1
-            type=raw,value=latest
-            type=raw,value=${{ inputs.version }},enable=${{ inputs.version != '' }}
+            type=match,pattern=v(.*),group=1,priority=300
+            type=raw,value=${{ inputs.version }},enable=${{ inputs.version != '' }},priority=300
+            type=raw,value=latest,priority=100
           labels: |
             org.opencontainers.image.licenses=AGPL-3.0-or-later
 
