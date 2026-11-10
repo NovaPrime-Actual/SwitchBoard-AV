@@ -4,7 +4,7 @@ SwitchBoard-AV, newest first.
 
 ## Unreleased
 
-- **Docker image.** A `Dockerfile` and a workflow that publishes the app as an image on the GitHub Container Registry (`ghcr.io/novaprime-actual/switchboard-av`, for Intel/AMD and ARM) whenever a release is published. Saved data lives in `/data`, so mount a volume there. The README has the run command. Nothing in the app itself changed.
+- **Docker image.** A `Dockerfile` and a workflow that publishes the app as an image on the GitHub Container Registry (`ghcr.io/novaprime-actual/switchboard-av`, for Intel/AMD and ARM) whenever a release is published. Saved data lives in `/data`, so mount a volume there. A new `DOCKER.md` has the run command, a Docker Compose example and the things to know. Nothing in the app itself changed.
 
 ## v2.15 (11/10/26)
 

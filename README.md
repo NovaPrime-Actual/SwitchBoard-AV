@@ -25,32 +25,10 @@ Node's built-in modules only.
 
 ### Run it with Docker
 
-Each release is also published as a container image on the GitHub Container Registry, for Linux on Intel/AMD
-and ARM (such as a Raspberry Pi):
-
-```
-docker run -d --name switchboard-av --hostname switchboard-av --restart unless-stopped \
-  -p 8080:8080 -v switchboard-data:/data \
-  -e TLS_HOSTS=av.example.org \
-  ghcr.io/novaprime-actual/switchboard-av:latest
-```
-
-- **Keep the data.** Everything the app saves lives in `/data` (accounts, groups, the device list, activity,
-  the self-signed certificate). Mount a volume or a folder there, as above, or it is lost when the container
-  is removed. To update, pull the new image and run the command again; the data stays.
-- **First sign-in.** The temporary admin password is printed once, in the container's log:
-  `docker logs switchboard-av`.
-- **Certificate names.** Inside a container the app only knows the container's own name and address, so set
-  `TLS_HOSTS` to the name or address people type (comma separated), or the browser warning will also say the
-  name does not match. Keep `--hostname` as above: without it Docker gives every new container a random
-  name, and the app makes a new self-signed certificate (and browsers warn again) each time you update. See
-  **HTTPS** below.
-- **Reaching the screens.** The app talks to the decoders over the network, so the container must be able to
-  reach them. A normal Docker network works for that. Use `--network host` (Linux only) if your network
-  needs it, and then drop `-p`.
-- **Pin a version.** Use a tag such as `:2.15` instead of `:latest` to stay on one release. The image is
-  built by `.github/workflows/docker.yml` when a release is published, from the `Dockerfile` in this folder.
-  The other settings in the table below are passed with `-e`.
+Each release is also published as a container image (`ghcr.io/novaprime-actual/switchboard-av`, for Intel/AMD
+and ARM). **[DOCKER.md](DOCKER.md)** has the `docker run` command, a Docker Compose example, and what to know
+about keeping the data, the certificate and reaching the screens. The settings in the table below are passed
+to the container the same way as anywhere else, as environment variables.
 
 ### Environment variables (all optional)
 

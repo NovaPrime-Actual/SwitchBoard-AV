@@ -7,7 +7,7 @@
 #   docker run -d --name switchboard-av --hostname switchboard-av --restart unless-stopped \
 #     -p 8080:8080 -v switchboard-data:/data ghcr.io/novaprime-actual/switchboard-av:latest
 #
-# The README ("Run it with Docker") has the details. The Node version matches .nvmrc.
+# DOCKER.md has the details, including a Docker Compose example. The Node version matches .nvmrc.
 
 FROM node:24-alpine
 
