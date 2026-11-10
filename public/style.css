@@ -85,17 +85,21 @@ select:focus-visible {
 }
 
 /* ===== header ===== */
+
+/* a rounded bar that floats a little way in from the edges of the page */
 header {
   position: sticky;
-  top: 0;
+  top: var(--space-4);
   z-index: var(--z-header);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-6);
   align-items: center;
-  padding: var(--space-5) var(--space-10);
+  padding: var(--space-5) var(--space-9);
+  margin: var(--space-4);
   background: var(--header-sheen), var(--accent);
-  border-bottom: var(--border-width) solid var(--header-divider);
+  border: var(--border-width) solid var(--header-divider);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-header);
 }
 

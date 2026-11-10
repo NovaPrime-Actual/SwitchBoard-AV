@@ -135,7 +135,7 @@
   --avatar-size: 1.5rem;
   --nav-bar-width: 0.1875rem;
   --message-height: 1.125rem;
-  --header-height: 3.8125rem;
+  --header-height: 4.875rem; /* the bar (3.875rem with its border) plus the gap above and below it */
   --logo-height: 2.5rem;
   --logo-max-width: 7.5rem;
   --login-logo-max-height: 6rem;
