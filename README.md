@@ -23,6 +23,33 @@ The start-up summary lists the addresses to use. Open `https://localhost:8080` o
 `https://<server address>:8080` it shows under _Network_ from another one (or whatever `PORT` you set; see **HTTPS** below for the browser warning on the first visit, or use `TLS=off` for plain http). No npm install, no build step —
 Node's built-in modules only.
 
+### Run it with Docker
+
+Each release is also published as a container image on the GitHub Container Registry, for Linux on Intel/AMD
+and ARM (such as a Raspberry Pi):
+
+```
+docker run -d --name switchboard-av --restart unless-stopped \
+  -p 8080:8080 -v switchboard-data:/data \
+  -e TLS_HOSTS=av.example.org \
+  ghcr.io/novaprime-actual/switchboard-av:latest
+```
+
+- **Keep the data.** Everything the app saves lives in `/data` (accounts, groups, the device list, activity,
+  the self-signed certificate). Mount a volume or a folder there, as above, or it is lost when the container
+  is removed. To update, pull the new image and run the command again; the data stays.
+- **First sign-in.** The temporary admin password is printed once, in the container's log:
+  `docker logs switchboard-av`.
+- **Certificate names.** Inside a container the app only knows the container's own address, so set
+  `TLS_HOSTS` to the name or address people type (comma separated), or the browser warning will also say the
+  name does not match. See **HTTPS** below.
+- **Reaching the screens.** The app talks to the decoders over the network, so the container must be able to
+  reach them. A normal Docker network works for that. Use `--network host` (Linux only) if your network
+  needs it, and then drop `-p`.
+- **Pin a version.** Use a tag such as `:2.15` instead of `:latest` to stay on one release. The image is
+  built by `.github/workflows/docker.yml` when a release is published, from the `Dockerfile` in this folder.
+  The other settings in the table below are passed with `-e`.
+
 ### Environment variables (all optional)
 
 | Variable               | Default                               | Purpose                                                                                                                                                                                                    |
