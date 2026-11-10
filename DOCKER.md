@@ -46,7 +46,9 @@ volumes:
   switchboard-data:
 ```
 
-To update: `docker compose pull`, then `docker compose up -d`. The data stays in the volume.
+To update: `docker compose pull`, then `docker compose up -d`. The data stays in the volume. (Compose puts the
+folder's name in front of the volume's name, so in a folder called `av` it is `av_switchboard-data`;
+`docker compose down` keeps it, and `docker compose down -v` deletes it.)
 
 To build from a copy of this repository instead of pulling the image, replace the `image:` line with
 `build: .`.
