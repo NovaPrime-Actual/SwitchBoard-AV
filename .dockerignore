@@ -1,0 +1,17 @@
+# Only the program files go in the image (see the Dockerfile); keep everything else out of the build.
+.git
+.github
+.claude
+node_modules
+data
+test
+config
+*.md
+!LICENSE
+!NOTICE
+.gitattributes
+.gitignore
+.nvmrc
+package-lock.json
+Dockerfile
+.dockerignore

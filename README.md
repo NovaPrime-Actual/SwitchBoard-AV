@@ -23,6 +23,13 @@ The start-up summary lists the addresses to use. Open `https://localhost:8080` o
 `https://<server address>:8080` it shows under _Network_ from another one (or whatever `PORT` you set; see **HTTPS** below for the browser warning on the first visit, or use `TLS=off` for plain http). No npm install, no build step —
 Node's built-in modules only.
 
+### Run it with Docker
+
+Each release is also published as a container image (`ghcr.io/novaprime-actual/switchboard-av`, for Intel/AMD
+and ARM). **[DOCKER.md](DOCKER.md)** has the `docker run` command, a Docker Compose example, and what to know
+about keeping the data, the certificate and reaching the screens. The settings in the table below are passed
+to the container the same way as anywhere else, as environment variables.
+
 ### Environment variables (all optional)
 
 | Variable               | Default                               | Purpose                                                                                                                                                                                                    |

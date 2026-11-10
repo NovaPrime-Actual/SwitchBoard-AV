@@ -2,6 +2,10 @@
 
 SwitchBoard-AV, newest first.
 
+## Unreleased
+
+- **Docker image.** A `Dockerfile` and a workflow that publishes the app as an image on the GitHub Container Registry (`ghcr.io/novaprime-actual/switchboard-av`, for Intel/AMD and ARM) whenever a release is published. Saved data lives in `/data`, so mount a volume there. A new `DOCKER.md` has the run command, a Docker Compose example and the things to know. Nothing in the app itself changed.
+
 ## v2.15 (11/10/26)
 
 - **A more modern look.** A cooler, deeper dark theme, the system's own font (Segoe UI, SF, Roboto and so on) in place of Verdana, rounder corners, soft shadows and a lift on screen tiles when you point at them. The header is a rounded bar that floats in from the edges of the page, with a light sheen over your accent colour, a divider after the logo, a status pill that stays readable on any accent, and your initial beside the Menu button. The space list is a matching rounded panel with a "Spaces" label, counts in small badges, a soft highlight with a bar for the open space, a hover tinted with your accent colour, and stays in view while a long list of screens scrolls. A status dot sits before each screen's current source, and popups blur the page behind them. Colours, sizes and corners all still come from `public/tokens.css`, and the Branding tab's accent and highlight colours work as before. People whose system asks for reduced motion get no movement.
