@@ -15,6 +15,8 @@ body {
   margin: 0;
   font-family: var(--font-body);
   color: var(--text);
+  letter-spacing: var(--letter-spacing-tight);
+  -webkit-font-smoothing: antialiased;
   background: var(--surface-0);
 }
 
@@ -32,10 +34,21 @@ button {
   background: var(--surface-2);
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius-md);
+  box-shadow: var(--edge-highlight);
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition),
+    transform var(--transition),
+    filter var(--transition);
 }
 
 button:hover:not(:disabled) {
   background: var(--surface-3);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 button:disabled {
@@ -72,23 +85,33 @@ select:focus-visible {
 }
 
 /* ===== header ===== */
+
+/* a rounded bar that floats a little way in from the edges of the page */
 header {
   position: sticky;
-  top: 0;
+  top: var(--space-4);
   z-index: var(--z-header);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-6);
   align-items: center;
-  padding: var(--space-5) var(--space-10);
-  background: var(--accent);
+  padding: var(--space-5) var(--space-9);
+  margin: var(--space-4);
+  background: var(--header-sheen), var(--accent);
+  border: var(--border-width) solid var(--header-divider);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-header);
 }
 
 header h1 {
   display: none; /* the logo and the app name in the tab are enough on a phone */
+  padding-left: var(--space-7);
   margin: 0;
-  font-size: var(--font-size-3xl);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-strong);
   color: var(--text-on-accent);
+  letter-spacing: var(--letter-spacing-tight);
+  border-left: var(--border-width) solid var(--header-divider);
 }
 
 .header-logo {
@@ -109,6 +132,8 @@ header button {
   color: var(--text-on-accent);
   background: var(--on-accent-wash);
   border-color: var(--on-accent-outline);
+  border-radius: var(--radius-pill);
+  box-shadow: none;
 }
 
 header button:hover:not(:disabled) {
@@ -125,6 +150,21 @@ header button:hover:not(:disabled) {
   gap: var(--space-4);
   align-items: center;
   max-width: var(--menu-button-max-width);
+  padding-left: var(--space-3);
+}
+
+/* the signed-in person's initial in a small circle (app.js sets data-initial once it knows who that is) */
+.menu-btn[data-initial]::before {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-strong);
+  content: attr(data-initial);
+  background: var(--on-accent-wash-hover);
+  border-radius: var(--radius-pill);
 }
 
 /* who is signed in: first thing in the dropdown, not a button */
@@ -188,12 +228,29 @@ header .menu-list button:focus-visible {
 
 /* the line of status text in the header; the state classes recolour it only where listed */
 .status-message {
-  font-size: var(--font-size-md);
+  padding: var(--space-1) var(--space-6);
+  font-size: var(--font-size-sm);
   color: var(--text-on-accent);
+  background: var(--pill-on-accent);
+  border-radius: var(--radius-pill);
+}
+
+/* a small dot before the words, in the same colour as the words */
+.status-message::before {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-right: var(--space-3);
+  content: "";
+  background: currentcolor;
+  border-radius: var(--radius-pill);
+}
+
+.status-message:empty {
+  display: none;
 }
 
 .status-message.stamp {
-  font-size: var(--font-size-sm);
   color: var(--on-accent-dim);
 }
 
@@ -217,6 +274,7 @@ header .menu-list button:focus-visible {
   background: var(--surface-1);
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-modal);
 }
 
 /* Keep the logo's aspect ratio and fit it inside the card. */
@@ -262,9 +320,15 @@ header .menu-list button:focus-visible {
   width: 100%;
   min-height: var(--control-height);
   padding: var(--space-5);
-  background: var(--surface-2);
+  background: var(--surface-0);
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius-sm);
+  transition: border-color var(--transition);
+}
+
+.field input:hover,
+.field select:hover {
+  border-color: var(--text-dim);
 }
 
 /* Dropdowns (e.g. a screen's Space): large text so the list is easy to read and tap. */
@@ -330,14 +394,18 @@ nav {
   display: flex;
   flex: none;
   flex-direction: row;
-  gap: var(--space-3);
-  padding: var(--space-6);
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
+  margin: 0 var(--space-4);
   overflow-x: auto;
   background: var(--surface-1);
-  border-bottom: var(--border-width) solid var(--border);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
 }
 
 nav button {
+  position: relative;
   display: flex;
   flex: none;
   gap: var(--space-4);
@@ -346,17 +414,47 @@ nav button {
   text-align: left;
   background: transparent;
   border-color: transparent;
+  box-shadow: none;
 }
 
+/* pointing at a space tints it toward the accent colour, so it follows the Branding tab */
+nav button:hover:not(:disabled, .active) {
+  background: var(--surface-2); /* fallback */
+  background: color-mix(in srgb, var(--accent) var(--nav-hover-mix), var(--surface-1));
+}
+
+/* the open space: a soft tint of the highlight colour with a bar in the full colour
+   (under the button on a phone, down the left edge on a wide screen) */
 nav button.active {
-  color: var(--text-on-accent);
-  background: var(--select);
-  border-color: var(--select-tint);
+  color: var(--text);
+  background: var(--surface-2); /* fallback */
+  background: color-mix(in srgb, var(--select) var(--nav-active-mix), var(--surface-1));
+  border-color: transparent;
+}
+
+nav button.active::before {
+  position: absolute;
+  right: var(--space-6);
+  bottom: 0;
+  left: var(--space-6);
+  height: var(--nav-bar-width);
+  content: "";
+  background: var(--select-tint);
+  border-radius: var(--radius-pill);
 }
 
 nav .count {
+  align-self: center;
+  padding: 0 var(--space-4);
   font-size: var(--font-size-sm);
   color: var(--text-dim);
+  background: var(--surface-0);
+  border-radius: var(--radius-pill);
+}
+
+nav button.active .count {
+  color: var(--text-on-accent);
+  background: var(--select);
 }
 
 .empty-state {
@@ -383,6 +481,15 @@ nav .count {
   text-align: left;
   background: var(--surface-1);
   border-color: var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card), var(--edge-highlight);
+}
+
+.tile:hover:not(:disabled, .unselectable) {
+  background: var(--surface-1);
+  border-color: var(--accent-tint);
+  box-shadow: var(--shadow-card-hover), var(--edge-highlight);
+  transform: translateY(calc(-1 * var(--space-1)));
 }
 
 /* Device names such as Gym_Concession_Stand_Display have no spaces, so the browser treats them
@@ -407,6 +514,17 @@ nav button span {
   color: var(--accent-tint);
 }
 
+/* a small status dot before the line: the accent colour normally, amber when a screen did not answer */
+.tile .now::before {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-right: var(--space-3);
+  content: "";
+  background: currentcolor;
+  border-radius: var(--radius-pill);
+}
+
 .tile .now.noreply {
   color: var(--wait);
 }
@@ -427,6 +545,7 @@ nav button span {
   justify-content: center;
   padding: var(--space-10);
   background: var(--scrim);
+  backdrop-filter: blur(var(--blur-backdrop));
 }
 
 .backdrop.open {
@@ -441,6 +560,7 @@ nav button span {
   background: var(--surface-1);
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-modal);
 }
 
 .modal.narrow {
@@ -459,6 +579,7 @@ nav button span {
   flex: 1;
   margin: 0;
   font-size: var(--font-size-3xl);
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .modal-head .close {
@@ -481,8 +602,11 @@ nav button span {
   grid-column: 1 / -1;
   padding-top: var(--space-5);
   margin-top: var(--space-5);
-  font-size: var(--font-size-xl);
-  font-weight: 600;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-strong);
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-caps);
   border-top: var(--border-width) solid var(--border);
 }
 
@@ -490,12 +614,14 @@ nav button span {
   min-height: var(--source-min-height);
   padding: var(--space-7) var(--space-5);
   font-size: var(--font-size-xl);
+  border-radius: var(--radius-lg);
 }
 
 .src.current {
   color: var(--text-on-accent);
   background: var(--select);
   border-color: var(--select-tint);
+  box-shadow: var(--shadow-card);
 }
 
 /* ===== source inputs window ===== */
@@ -572,6 +698,7 @@ nav button span {
 
   border-color: var(--select-tint);
   box-shadow: 0 0 0 var(--selected-ring-width) var(--select-tint) inset;
+  transform: none;
 }
 
 .tile.unselectable {
@@ -695,6 +822,7 @@ nav button span {
   background: transparent;
   border-bottom: none;
   border-radius: var(--radius-md) var(--radius-md) 0 0;
+  box-shadow: none;
 }
 
 .admin-tabs button.active {
@@ -874,6 +1002,7 @@ nav button span {
   padding: var(--space-3) var(--space-8);
   background: transparent;
   border-radius: var(--radius-pill);
+  box-shadow: none;
 }
 
 .sub-tabs button.active {
@@ -1146,6 +1275,7 @@ nav button span {
   background: var(--corner-note-surface);
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius-sm);
+  backdrop-filter: blur(var(--blur-backdrop));
 }
 
 /* ===== about ===== */
@@ -1176,7 +1306,7 @@ nav button span {
   border-top: var(--border-width) solid var(--border);
 }
 
-/* ===== wide layout: space bar becomes a column on the left ===== */
+/* ===== wide layout: space bar becomes a rounded panel down the left, matching the header ===== */
 @media (width >= 45rem) {
   header h1 {
     display: block;
@@ -1186,15 +1316,51 @@ nav button span {
     flex-direction: row;
   }
 
+  /* the space list stays in view while a long list of screens scrolls */
   nav {
+    position: sticky;
+    top: var(--header-height);
     flex-direction: column;
+    align-self: flex-start;
     width: var(--nav-width);
-    overflow-x: visible;
-    border-right: var(--border-width) solid var(--border);
-    border-bottom: none;
+    height: calc(100vh - var(--header-height) - var(--space-4));
+    padding: var(--space-8) var(--space-6);
+    margin: 0 0 var(--space-4) var(--space-4);
+    overflow: visible auto;
+  }
+
+  nav::before {
+    padding: 0 var(--space-6) var(--space-3);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-strong);
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-caps);
+    content: "Spaces";
   }
 
   nav button {
     flex: initial;
+  }
+
+  nav button.active::before {
+    inset: var(--space-4) auto var(--space-4) 0;
+    width: var(--nav-bar-width);
+    height: auto;
+  }
+}
+
+/* People who ask their system for less motion get the colour changes only. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* stylelint-disable-next-line declaration-no-important */
+    transition: none !important;
+  }
+
+  .tile:hover:not(:disabled, .unselectable),
+  button:active:not(:disabled) {
+    transform: none;
   }
 }

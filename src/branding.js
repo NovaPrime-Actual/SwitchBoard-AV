@@ -54,10 +54,10 @@ export const LOGO_KINDS = [
   },
 ];
 
-const PAGE_BACKGROUND = [0x20, 0x1e, 0x1c];
+const PAGE_BACKGROUND = [0x0f, 0x12, 0x17];
 
 // matches --surface-0 in tokens.css
-const PANEL_BACKGROUND = [0x30, 0x2e, 0x2c];
+const PANEL_BACKGROUND = [0x17, 0x1b, 0x22];
 
 // --surface-1
 function hexToRgb(h) {

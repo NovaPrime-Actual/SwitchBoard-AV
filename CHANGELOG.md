@@ -2,6 +2,10 @@
 
 SwitchBoard-AV, newest first.
 
+## Unreleased
+
+- **A more modern look.** A cooler, deeper dark theme, the system's own font (Segoe UI, SF, Roboto and so on) in place of Verdana, rounder corners, soft shadows and a lift on screen tiles when you point at them. The header is a rounded bar that floats in from the edges of the page, with a light sheen over your accent colour, a divider after the logo, a status pill that stays readable on any accent, and your initial beside the Menu button. The space list is a matching rounded panel with a "Spaces" label, counts in small badges, a soft highlight with a bar for the open space, a hover tinted with your accent colour, and stays in view while a long list of screens scrolls. A status dot sits before each screen's current source, and popups blur the page behind them. Colours, sizes and corners all still come from `public/tokens.css`, and the Branding tab's accent and highlight colours work as before. People whose system asks for reduced motion get no movement.
+
 ## v2.14 (11/08/26)
 
 - **Search on the All tab.** A search box beside "Select several screens", on the All tab only. Every word typed must match the screen name or space (or IP, for managers and admins), in any order, ignoring case and accents. Screens the search hides are dropped from a "Select several" selection, so a batch switch never reaches a screen you cannot see.
