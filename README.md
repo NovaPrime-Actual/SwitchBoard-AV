@@ -29,7 +29,7 @@ Each release is also published as a container image on the GitHub Container Regi
 and ARM (such as a Raspberry Pi):
 
 ```
-docker run -d --name switchboard-av --restart unless-stopped \
+docker run -d --name switchboard-av --hostname switchboard-av --restart unless-stopped \
   -p 8080:8080 -v switchboard-data:/data \
   -e TLS_HOSTS=av.example.org \
   ghcr.io/novaprime-actual/switchboard-av:latest
@@ -40,9 +40,11 @@ docker run -d --name switchboard-av --restart unless-stopped \
   is removed. To update, pull the new image and run the command again; the data stays.
 - **First sign-in.** The temporary admin password is printed once, in the container's log:
   `docker logs switchboard-av`.
-- **Certificate names.** Inside a container the app only knows the container's own address, so set
+- **Certificate names.** Inside a container the app only knows the container's own name and address, so set
   `TLS_HOSTS` to the name or address people type (comma separated), or the browser warning will also say the
-  name does not match. See **HTTPS** below.
+  name does not match. Keep `--hostname` as above: without it Docker gives every new container a random
+  name, and the app makes a new self-signed certificate (and browsers warn again) each time you update. See
+  **HTTPS** below.
 - **Reaching the screens.** The app talks to the decoders over the network, so the container must be able to
   reach them. A normal Docker network works for that. Use `--network host` (Linux only) if your network
   needs it, and then drop `-p`.

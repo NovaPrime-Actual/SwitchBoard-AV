@@ -4,8 +4,8 @@
 # program files in a small Node image. Everything the app saves (accounts, groups, the device list, activity,
 # the self-signed certificate) goes in /data: mount a volume there or it is lost when the container is removed.
 #
-#   docker run -d --name switchboard-av --restart unless-stopped -p 8080:8080 -v switchboard-data:/data \
-#     ghcr.io/novaprime-actual/switchboard-av:latest
+#   docker run -d --name switchboard-av --hostname switchboard-av --restart unless-stopped \
+#     -p 8080:8080 -v switchboard-data:/data ghcr.io/novaprime-actual/switchboard-av:latest
 #
 # The README ("Run it with Docker") has the details. The Node version matches .nvmrc.
 
