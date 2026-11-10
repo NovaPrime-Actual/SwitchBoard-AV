@@ -188,6 +188,7 @@ function renderWho() {
   const roleLabel = { admin: "Admin", manager: "Manager", user: "User" }[me.role] || me.role;
   const groups = me.groupNames || [];
   $("menuWhoName").textContent = me.name || me.username;
+  $("menuBtn").dataset.initial = (me.name || me.username || "?").trim().charAt(0).toUpperCase();
   $("menuWhoName").title = "Username: " + me.username; // on hover, for the rare case two people share a name
   $("menuWhoRole").textContent = "Role: " + roleLabel;
   $("menuWhoGroups").textContent =

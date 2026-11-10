@@ -95,14 +95,19 @@ header {
   align-items: center;
   padding: var(--space-5) var(--space-10);
   background: var(--header-sheen), var(--accent);
+  border-bottom: var(--border-width) solid var(--header-divider);
   box-shadow: var(--shadow-header);
 }
 
 header h1 {
   display: none; /* the logo and the app name in the tab are enough on a phone */
+  padding-left: var(--space-7);
   margin: 0;
-  font-size: var(--font-size-3xl);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-strong);
   color: var(--text-on-accent);
+  letter-spacing: var(--letter-spacing-tight);
+  border-left: var(--border-width) solid var(--header-divider);
 }
 
 .header-logo {
@@ -141,6 +146,21 @@ header button:hover:not(:disabled) {
   gap: var(--space-4);
   align-items: center;
   max-width: var(--menu-button-max-width);
+  padding-left: var(--space-3);
+}
+
+/* the signed-in person's initial in a small circle (app.js sets data-initial once it knows who that is) */
+.menu-btn[data-initial]::before {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-strong);
+  content: attr(data-initial);
+  background: var(--on-accent-wash-hover);
+  border-radius: var(--radius-pill);
 }
 
 /* who is signed in: first thing in the dropdown, not a button */
@@ -204,12 +224,29 @@ header .menu-list button:focus-visible {
 
 /* the line of status text in the header; the state classes recolour it only where listed */
 .status-message {
-  font-size: var(--font-size-md);
+  padding: var(--space-1) var(--space-6);
+  font-size: var(--font-size-sm);
   color: var(--text-on-accent);
+  background: var(--pill-on-accent);
+  border-radius: var(--radius-pill);
+}
+
+/* a small dot before the words, in the same colour as the words */
+.status-message::before {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-right: var(--space-3);
+  content: "";
+  background: currentcolor;
+  border-radius: var(--radius-pill);
+}
+
+.status-message:empty {
+  display: none;
 }
 
 .status-message.stamp {
-  font-size: var(--font-size-sm);
   color: var(--on-accent-dim);
 }
 
@@ -353,14 +390,15 @@ nav {
   display: flex;
   flex: none;
   flex-direction: row;
-  gap: var(--space-3);
-  padding: var(--space-6);
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
   overflow-x: auto;
   background: var(--surface-1);
   border-bottom: var(--border-width) solid var(--border);
 }
 
 nav button {
+  position: relative;
   display: flex;
   flex: none;
   gap: var(--space-4);
@@ -376,16 +414,29 @@ nav button:hover:not(:disabled, .active) {
   background: var(--surface-2);
 }
 
+/* the open space: a soft tint of the highlight colour with a bar in the full colour
+   (under the button on a phone, down the left edge on a wide screen) */
 nav button.active {
-  color: var(--text-on-accent);
-  background: var(--select);
-  border-color: var(--select-tint);
-  box-shadow: var(--shadow-card);
+  color: var(--text);
+  background: var(--surface-2); /* fallback */
+  background: color-mix(in srgb, var(--select) var(--nav-active-mix), var(--surface-1));
+  border-color: transparent;
+}
+
+nav button.active::before {
+  position: absolute;
+  right: var(--space-6);
+  bottom: 0;
+  left: var(--space-6);
+  height: var(--nav-bar-width);
+  content: "";
+  background: var(--select-tint);
+  border-radius: var(--radius-pill);
 }
 
 nav .count {
   align-self: center;
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-4);
   font-size: var(--font-size-sm);
   color: var(--text-dim);
   background: var(--surface-0);
@@ -394,7 +445,7 @@ nav .count {
 
 nav button.active .count {
   color: var(--text-on-accent);
-  background: var(--count-on-select);
+  background: var(--select);
 }
 
 .empty-state {
@@ -1256,16 +1307,38 @@ nav button span {
     flex-direction: row;
   }
 
+  /* the space list stays in view while a long list of screens scrolls */
   nav {
+    position: sticky;
+    top: var(--header-height);
     flex-direction: column;
+    align-self: flex-start;
     width: var(--nav-width);
-    overflow-x: visible;
+    height: calc(100vh - var(--header-height));
+    padding: var(--space-8) var(--space-6);
+    overflow: visible auto;
     border-right: var(--border-width) solid var(--border);
     border-bottom: none;
   }
 
+  nav::before {
+    padding: 0 var(--space-6) var(--space-3);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-strong);
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-caps);
+    content: "Spaces";
+  }
+
   nav button {
     flex: initial;
+  }
+
+  nav button.active::before {
+    inset: var(--space-4) auto var(--space-4) 0;
+    width: var(--nav-bar-width);
+    height: auto;
   }
 }
 

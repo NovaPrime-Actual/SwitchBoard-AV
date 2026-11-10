@@ -63,9 +63,10 @@
   --on-accent-outline: rgb(255 255 255 / 35%);
   --on-accent-outline-strong: rgb(255 255 255 / 50%);
   --on-accent-dim: rgb(255 255 255 / 75%);
+  --header-divider: rgb(255 255 255 / 14%); /* hairlines in the header */
 
-  /* the little count badge inside the highlighted space button */
-  --count-on-select: rgb(0 0 0 / 25%);
+  /* behind the header's status text, so it reads on any accent */
+  --pill-on-accent: rgb(0 0 0 / 22%);
   --corner-note-surface: rgb(15 18 23 / 88%);
   --shadow-menu: 0 12px 32px rgb(0 0 0 / 55%), 0 0 0 1px rgb(255 255 255 / 4%);
   --shadow-card: 0 1px 2px rgb(0 0 0 / 35%);
@@ -78,6 +79,7 @@
     rgb(0 0 0 / 12%)
   ); /* depth over whatever the accent is */
 
+  --nav-active-mix: 22%; /* how far the open space's button is tinted toward the highlight colour */
   --selected-mix: 28%; /* how far a selected tile is tinted toward the highlight colour */
 
   /* ----- type ----- */
@@ -130,6 +132,8 @@
   --control-height-row: 2.25rem;
   --checkbox-size: 1.375rem;
   --swatch-width: 3.5rem;
+  --avatar-size: 1.5rem;
+  --nav-bar-width: 0.1875rem;
   --message-height: 1.125rem;
   --header-height: 3.8125rem;
   --logo-height: 2.5rem;
