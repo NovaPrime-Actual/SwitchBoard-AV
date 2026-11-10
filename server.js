@@ -1,5 +1,5 @@
 // ===========================================
-// SWITCHBOARD-AV  v2.14
+// SWITCHBOARD-AV  v2.15
 // Description: Local web app that switches Visionary decoders to an encoder over UDP,
 //   with a readback check. Serves public/index.html (+ app.js, tokens.css, style.css) and a small JSON API.
 //   Per-user accounts, roles (admin/manager/user) and access groups scope which decoders
